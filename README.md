@@ -9,10 +9,10 @@
 
 <img src="https://i.pinimg.com/564x/50/9f/9f/509f9fd84bad8297a5511cd02e300389.jpg" width="400px">
 
-| 챕터     | 제목          | 진행현황 | 링크 |
+| 챕터        | 제목           | 진행현황 | 링크     |
 | -------     | -------------- | -------- | -------- |
-| 1장         | 꺠끗한 코드    | `진행중` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/1%EC%9E%A5) |        
-| 2장         |                | `진행중` |          |
+| 1장         | 깨끗한 코드    | `완료`   | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/1%EC%9E%A5) |        
+| 2장         | 의미있는 이름  | `진행중` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/2%EC%9E%A5)         |
 | 4장         |                | `진행중` |          |
 | 5장         |                | `진행중` |          |
 | 6장         |                | `진행중` |          |
