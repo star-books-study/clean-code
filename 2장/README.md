@@ -69,11 +69,11 @@ public List<Cell> getFlaggedCells() {
 	List<Cell> flaggedCells = new ArrayList<Cell>();
 	for(Cell cell : gameBoard)
 		if(cell.isFlagged())
-			flaggedCells.ad(cell);
+			flaggedCells.add(cell);
 	return flaggedCells;
 ```
 
 - `cell`을 int 배열 대신 간단한 클래스로 만들었다.
-- isFlagged라는 좀 더 명시적인 함수를 사용해 FLAGGED라는 상수를 감추었다.
+- `isFlagged`라는 좀 더 명시적인 함수를 사용해 `FLAGGED`라는 상수를 감추었다.
 
 
