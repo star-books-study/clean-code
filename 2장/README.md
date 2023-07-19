@@ -135,7 +135,86 @@ public List<Cell> getFlaggedCells() {
     ```
     
 - 그 외
-    - 명확한 관례가 없다면 `moneyAmount`와 `mone`y는 구분이 안된다.
+    - 명확한 관례가 없다면 `moneyAmount`와 `money`는 구분이 안된다.
     - `customerInfo`와 `customer`
     - `accountData`와 `account`
     - `theMessage`와 `message`
+
+## 📌 발음하기 쉬운 이름을 사용하라
+
+### 발음하기 어려운 이름은 토론하기도 어렵다.
+
+- 발음하기 쉬운 단어는 중요
+    - 프로그래밍은 사회활동이기 때문
+- 다음 두 예제를 비교해보자.
+    
+    ```java
+    class DtaRcrd102 {
+    	private Date genymdhms;
+    	private Date modymdhms;
+    	private final String pszqint = "102";
+    	/* ... */
+    };
+    ```
+    
+    ```java
+    class Customer {
+    	private Date generationTimestamp;
+    	private Date modificationTimestampl
+    	private final String recordId = "102";
+    };
+    ```
+    
+    - 둘 째 코드는 지적인 대화가 가능해진다. 😎
+
+## 📌 검색하기 쉬운 이름을 사용하라
+
+### 문자 하나를 사용하는 이름과 상수는 쉽게 눈에 띄지 않는다
+
+- `MAX_CLASSED_PER_STUDENT` 는 `grep`으로 찾기 쉽지만, 숫자 7은 은근히 까다롭다.
+    - 7이 들어간 파일 이름이나 수식이 모두 검색되기 때문
+- `e`라는 문자도 변수 이름으로 적합하지 못하다.
+    - 영어에서 가장 많이 쓰이는 문자 → 검색이 어려움
+- 이런 관점에서 **긴 이름이 짧은 이름보다 좋다.**
+- **검색하기 쉬운 이름이 상수보다 좋다.**
+- 필자는 간단한 메서드에서 로컬 변수만 한 문자를 사용함.
+    - ⭐️ **이름 길이는 범위 크기에 비례해야 한다.**
+    - **변수나 상수를 여러 곳에서 사용한다면 검색하기 쉬운 이름이 바람직하다.**
+    - 다음 두 예제를 비교해보자.
+        
+        ```java
+        for(int j=0; j<34; j++) {
+        	s += (t[j]*4)/5;
+        }
+        ```
+        
+        ```java
+        int realDaysPerIdealDay = 4;
+        const int WORK_DAYS_PER_WEEK = 5;
+        int sum = 0;
+        
+        for(int j=0; j < NUMBER_OF_TASKS; j++) {
+        	int realTasksDays = taskEstimate[j] * realDaysPerIdealDay;
+        	int realTasksWeeks = (realTaskDays / WORK_DAYS_PER_WEEK);
+        	sum += realTasksWeeks;
+        }
+        ```
+        
+        (아마도 **일을 끝내는 데 몇 주가 걸리는지** 계산하는 코드인 것 같음. `realDaysPerIdealDays`는 이상적으로 1일이 소요된다고 추정되었을 때, **실제로**는 얼마나 소요될지 나타내는 변수임. 즉, 1일의 이상적인 추정치는 4일로 변환됨. `taskEstimate`는 그 일을 끝내는 데 **며칠**이 걸리는지 추정한 변수임. 계산하면 결국 `sum`에는 총 몇 주 걸리는지가 저장됨.)
+        (나는 지금까지 변수를 적게 선언하면 할수록 좋은 줄 알았는데 꼭 그런 것만은 아니네…)
+        
+        - 위 코드에서 `sum`이 별로 유용하진 않으나 최소한 검색은 가능하다.
+        - 이름을 의미있게 지으면 함수가 길어진다.
+            - 하지만 `WORK_DAYS_PER_WEEK`를 찾기가 얼마나 쉽냐!!!
+            - 그냥 5를 사용한다면 5가 들어가는 이름을 모두 찾은 후 의미를 분석해 원하는 상수를 가려내야 하리라.
+
+## 📌 인코딩을 피하라
+
+- 문제 해결에 집중하는 개발자에게 인코딩은 불필요한 정신적 부담
+- 인코딩한 이름은 거의 발음하기 어려우며 오타가 생기기도 한다.
+
+### 헝가리식 표기법
+
+```java
+
+```
