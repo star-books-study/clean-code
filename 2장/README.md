@@ -387,6 +387,8 @@ public class Part {
 
 - 특정 문화에서만 사용하는 농담은 피하는 편이 좋다.
 
+<br>
+
 ## 📌 한 개념에 한 단어를 사용하라
 
 - **추상적인 개념 하나에 단어 하나를 선택해 이를 고수한다.**
@@ -440,3 +442,136 @@ public class Part {
 - **적절한 ‘프로그래머 용어’가 없다면 문제 영역에서 이름을 가져온다.**
   
 - 우수한 프로그래머와 설계자라면 해법 영역과 문제 영역을 구분할 줄 알아야 한다.
+
+<br>
+
+## 📌 의미 있는 맥락을 추가하라
+
+- 스스로 의미가 분명한 이름도 있지만, 대다수 이름이 그렇지 못한다.
+
+- 그래서 **클래스, 함수, 이름 공간**에 넣어 맥락을 부여한다.
+- 모든 방법이 실패하면 **마지막 수단으로 접두어를 붙인다.**
+- 예를 들어, `firstName`, `lastName`, `street`, `houseNumber`, `city`, `state`, `zipcode`라는 변수가 있다.
+    - 변수를 훑어보면 주소임.
+  
+    - 그러나 어느 메서드가 `state` 변수 하나만 사용한다면? → `state`가 주소의 일부라는 걸 알아채기 어려움
+    - `addr`라는 접두어를 추가해 `addrFirstName`, `addrLastName`, `addrState`라 쓰면 맥락이 좀 더 분명해짐.
+    - 물론 `Address`라는 **클래스**를 생성하면 더 좋음.
+
+### **맥락이 불분명한 변수 예시**
+
+```java
+private void printGuessStatistics(char candidate, int count) {
+	String number;
+	String verb;
+	String pluralModifier;
+	if (count == 0) {
+		number = "no";
+		verb = "are";
+		plurarModifier = "s";
+	} else if (count == 1) {
+		number = "1";
+		verb = "is";
+		pluralModifier = "";
+	} else {
+		number = Integer.toString(count);
+		verb = "are";
+		pluralModifier = "s";
+	}
+	String guessMessage = String.format(
+		"There %s %s %s%s", verb, number, candidate, pluralModifier
+	);
+	print(guessMessage);
+}
+```
+
+- 함수 이름은 맥락의 **일부**만 제공하며, 알고리즘이 나머지 맥락을 제공
+
+- 함수를 끝까지 읽어보고 나서야 `number`, `verb`, `pluralModifier` 변수 세 개가 통계 추측 메시지에 사용된다는 사실이 드러남.
+- 불행히도 독자가 맥락을 유추해야 함.
+- 일단 함수가 좀 길고 세 변수를 함수 전반에서 사용한다.
+    - 함수를 작은 조각으로 쪼개고자 `GuessStatisticsMessage` 라는 클래스를 만든 후 세 변수를 클래스에 넣어보자.
+
+### 맥락이 분명한 변수 예시
+
+```java
+public class GuessStatisticsMessage {
+	private String number;
+	private String verb;
+	private String pluralNumber;
+
+	public String make(char candidate, int count) {
+		createPluralDependentMessageParts(count);
+		return String.format(
+			"There %s %s %s%s",
+			verb, number, candidate, pluralModifier );
+	}
+
+	private void createPluralDependentMessageParts(int count) {
+		if (count == 0) {
+			thereAreNoLetters();
+		} else if (count == 1) {
+			thereIsOneLetter();
+		} else {
+			thereAreManyLetters(count);
+		}
+}
+
+priva
+```
+
+- 세 변수는 맥락이 분명해졌다. (확실하게 `GuessStaticsMessage`)에 속한다.
+
+- 이렇게 맥락을 개선하면 함수를 쪼개기가 쉬워지므로 알고리즘도 좀 더 명확해진다.
+
+## 📌 불필요한 맥락을 없애라
+
+- ‘고급 휘발유 충전소(Gas Statioin Deluxe)라는 애플리케이션을 짠다고 가정하자.
+
+- 모든 클래스 이름을 `GSD`로 시작하겠다는 생각은 바람직하지 못하다.
+    - 모두 다 GSD로 시작하기 때문에 G만 쳐도 IDE는 G로 시작하는 모-든 클래스를 열거할거임.
+  
+- **일반적으로 짧은 이름이 긴 이름보다 좋다.**
+    - 단, 의미가 분명한 경우에 한해서!
+- `accountAddress`와 `customerAddress`는 `Address` **클래스 인스턴스로는 좋은 이름**이지만, **클래스 이름으로는 적합하지 못하다.**
+- 포트번호, MAC 주소, 웹 주소를 구분해야 한다면 `PostalAddress`, `MAC`, `URI`라는 이름을 쓰면 의미가 분명해진다.
+
+> 사람들이 이름을 바꾸지 않으려는 이유 하나는 다른 개발자가 반대할까 두려워서다. 우리들 생각은 다르다. 오히려 (좋은 이름으로 바꿔주면) 반갑고 고맙다.
+> 
+
+> 여느 코드 개선 노력과 마찬가지로 이름 역시 나름대로 바꿨다가는 누군가 질책할지도 모른다. 그렇다고 코드를 개선하려는 노력을 중단해서는 안된다.
+> 
+
+# 추가적인 질문이나 의문점
+
+- 의미 있는 맥락을 추가하면서 불필요한 맥락을 없애는 것을 동시에 하는 건 쉽지 않은 것 같다.
+  
+    - 불필요한 맥락을 없애라는 글 부분이 이해가 가지 않아서 좀 더 찾아봄
+  
+        - 커피 관련 앱을 만든다고 모든 클래스 이름을 `Coffee`로 시작하지 마라! << 이 예시가 더 와닿았음
+
+# 이 장에서 얻은 것
+
+- 좋은 이름을 지으려면 시간이 걸리지만 좋은 이름으로 절약하는 시간이 훨씬 많다.
+
+- 의미 있는 이름을 지어라!
+- 서로 흡사한 이름은 사용하지 말자.
+- 이름이 달라지만 의미도 달라져야 한다.
+- `Info`, `Data`, `String,` `Object`등 (맥락에 따라 다르겠지만) 불용어를 사용하지 말아라.
+- 검색하기 쉬운 이름을 사용하라.
+- 이름 길이는 범위 크기에 비례해야 한다.
+- 명료함이 최고다.
+- 의미있는 맥락을 추가하라.
+- 불필요한 맥락은 없애라.
+
+<br>
+
+# 뭔가 애매하게 적고 싶은 무언가
+
+
+- 변수명 짓는 건 어렵다..
+
+- 백준 문제 조금씩이라도 푸는 중인데 그냥 N, X, 이런 거 안쓰고 코드 맥락 신경써서 지을려고 하니까
+    - 은근… 재밌다!!!!
+  
+    - 변수명이 직관적이니까 읽기도 쉬움
