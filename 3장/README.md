@@ -5,5 +5,20 @@
 - 다음 코드를 보자.
     
     ```java
-    코드가 너무 길어 ...
+    public static String testTableHtml(
+        PageData pageData,
+        boolean includeSuiteSetUp
+    ) thorws Exception {
+        WikiPage wikiPage = pageData.getWikiPage();
+        if (pageData.hasAttribute("Test)) {
+            if(includeSuiteSetup) {
+                WikiPage suiteSetup = 
+                    PageCrawlerImpl.getInheritedPage(
+                        SuiteResponder.SUITE_SETUP_NAME, wikipage
+                    );
+
+                // 더 쓰기
+            }
+        }
+    }
     ```
