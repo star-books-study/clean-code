@@ -205,4 +205,46 @@ public static String renderPageWithSetupsAndTeardowns(
   - 위에서 아래로 프로그램을 읽으면 함수 추상화 수준이 한 번에 한 단계씩 낮아진다 ⇒ **내려가기 규칙**
 - TO 문단을 읽듯이 프로그램이 읽혀야 한다.
 
+    ```java
+    TO 설정 페이지와 해제 페이지를 포함하려면, 설정 페이지를 포함하고, 테스트 페이지 내용을 포함하고, 해제 페이지를 포함한다.
+        TO 설정 페이지를 포함하려면, 슈트이면 슈트 설정 페이지를 포함한 후 일반 설정 페이지를 포함한다.
+        TO 슈트 설정 페이지를 포함하려면, 부모 계층에서 "SuiteSetUp" 페이지를 찾아 include 문과 페이지 경로를 추가한다.
+        TO 부모 계층을 검색하려면, ....
+    ```
+
 - 하지만 추상화 수준이 하나인 함수를 구현하기란 쉽지 않다. 핵심은 짧으면서도 ‘한 가지’만 하는 함수다.
+
+## 📌 Switch 문
+
+### Swtich 문의 단점
+
+- 작게 만들기 어렵다.
+  
+- ‘한 가지’ 작업만 하는 switch 문도 만들기 어렵다. 본질적으로 switch문은 N가지를 처리한다.
+
+### 해결방법
+
+- switch문을 완전히 피할 수는 없다.
+- 하지만 각 switch 문을 저차원 클래스에 숨기고 절대로 반복하지 않는 방법은 있다. (다형성을 이용한다.)
+    
+    ```java
+    public Money calculatePay(Employee e)
+    throws InvalidEmployeeType {
+    	switch (e.type) {
+    		case COMMISSIONED:
+    			return calculateCommissionedPay(e);
+    		case HOURLY:
+    			return calculateHourlyPay(e);
+    		case SALARIED:
+    			return calculateSalariedPay(e);
+    		default:
+    			throw new InvalidEmployeeType(e.type);
+    	}
+    }
+    ```
+    
+    - 이 함수의 문제점
+
+        - 함수가 길다.
+  
+        - ‘한 가지’ 작업만 수행하지 않는다.
