@@ -248,3 +248,324 @@ public static String renderPageWithSetupsAndTeardowns(
         - 함수가 길다.
   
         - ‘한 가지’ 작업만 수행하지 않는다.
+
+
+### 해결방법
+
+- switch문을 완전히 피할 수는 없다.
+- 하지만 각 switch 문을 저차원 클래스에 숨기고 절대로 반복하지 않는 방법은 있다. (다형성을 이용한다.)
+    
+    ```java
+    /*
+    	예시4
+    */
+    public Money calculatePay(Employee e)
+    throws InvalidEmployeeType {
+    	switch (e.type) {
+    		case COMMISSIONED:
+    			return calculateCommissionedPay(e);
+    		case HOURLY:
+    			return calculateHourlyPay(e);
+    		case SALARIED:
+    			return calculateSalariedPay(e);
+    		default:
+    			throw new InvalidEmployeeType(e.type);
+    	}
+    }
+    ```
+    
+    - 이 함수의 문제점
+        1. 함수가 길다.
+        2. ‘한 가지’ 작업만 수행하지 않는다.
+        3. SRP(Single Responsibility Principle)를 위반한다. 
+            
+            > 클래스는 단 한 개의 책임을 가져야 한다는 원칙
+            > 
+            - 코드를 변경할 이유가 여럿이기 때문
+        4. OCP(Open-Closed Principle)를 위반한다.
+            
+            > '소프트웨어 개체(클래스, 모듈, 함수 등등)는 확장에 대해 열려 있어야 하고, 수정에 대해서는 닫혀 있어야 한다'는 프로그래밍 원칙
+            > 
+            - 새 직원 유형을 추가할 때마다 코드를 변경해야 하기 때문이다.
+        5. 가장 심각한 문제는, 위 함수와 구조가 동일한 함수가 무한정 존재
+            
+            ```java
+            isPayDay(Employee e, Date date);
+            deliverPay(Employee e, Money pay);
+            ```
+            
+            아래는 이 문제를 해결한 코드. switch 문을 추상 팩토리에 꽁꽁 숨겨 아무에게도 보여주지 않는 코드임.
+            
+            ```java
+            /*
+            	예시5
+            */
+            public abstract class Employee {
+            	public abstract boolean isPayday();
+            	public abstract Money calculatePay();
+            	public abstract void deliveryPay(Money pay);
+            
+            ------------
+            
+            public interface EmployeeFactory {
+            	public Employee makeEmployee(EmployeeRecode r) throws InvalidEmployeeType
+            }
+            
+            ------------
+            
+            public class EmployeeFactoryImpl implements EmployeeFactory {
+            	public Employee makeEmployee(EmployeeRecord r) throws InvalidEmployeeType {
+            		switch(r.type) {
+            			case COMMMISIONED:
+            				return new CommissionedEmployee(r);
+            			case HOURLY:
+            				return new HourlyEmployee(r);
+            			case SALARIED:
+            				return new SalariedEmployee(r);
+            			default:
+            				throw new InvalidEmployeeType(r.type);
+            		}
+            	}
+            }
+            ```
+            
+            - 팩토리는 switch 문을 사용해 적절한 `Employee` 파생 클래스의 인스턴스를 생성
+            - `calculatePay`, `isPayday,` `deliveryPay` 등과 같은 함수는 `Employee` 인터페이스를 거쳐 호출
+            - **다형성으로 인해 실제 파생 클래스의 함수가 실행**
+- 저자는 switch 문은 다형성 객체를 생성하는 코드 안에서만 사용한다.
+    - 이렇게 상속 관계로 숨긴 후에는 절대로 다른 코드에 노출하지 않는다.
+    - 불가피한 상황은 ㅇㅈ
+
+## 📌 서술적인 이름을 사용하라!
+
+- 이름이 길어도 괜찮음.
+- ⭐️ **길고 서술적인 이름이 짧고 어려운 이름보다 좋다.**
+- 함수 이름을 정할 때는 여러 단어가 쉽게 읽히는 명명법을 사용한다.
+    - 그런 다음, 여러 단어를 사용해 함수 기능을 잘 표현하는 이름을 선택한다.
+- 이름을 정하느라 시간을 들여도 괜찮다.
+    - 이런저런 이름을 넣어 코드를 읽어보면 더 좋다.
+    - 서술적인 이름을 사용하면 개발자 머릿 속에서도 설계가 뚜렷해지므로 코드를 개선하기 쉬워진다.
+- 이름을 붙일 때는 일관성이 있어야 한다.
+    - 모듈 내에서 함수 이름은 같은 문구, 같은 명사, 동사를 사용한다.
+        - 좋은 예 : `includeSetupAndTeardownPages`, `includeSetupPages`, `includeSuiteSetupPage`, `includeSetupPage`
+
+## 📌 함수 인수
+
+- 함수에서 이상적인 인수 개수는 0개(무항)다.
+    - 3개(삼항)은 가능한 피하는 편이 좋다.
+    - 4개 이상은 특별한 이유가 필요하다. 특별한 이유가 있어도 사용하면 안된다.
+- 테스트 관점에서 보면 인수는 더 어렵다.
+    - 갖가지 인수 조합으로 함수를 검증하는 테스트 케이스를 작성한다고 생각해보자.
+        - 인수가 3개를 넘어서면 인수마다 모든 조합을 구성해 테스트하기가 상당히 부담스럽..
+- 출력 인수는 입력 인수보다 이해하기 어렵다.
+    - 우리는 함수에 인수로 입력을 넘기고 반환값으로 출력을 받는다는 개념에 익숙
+    - 함수에서 인수로 결과를 받으리라 기대하지 않는다.
+- 최선은 입력 인수가 없는 경우
+    - 차선은 입력 인수가 1개 뿐인 경우
+    - 좋은 예 : `SetupTeardownIncluder.render(pageData)`
+        - pageData 객체 내용을 렌더링하겠다는 뜻
+
+### 많이 쓰는 단항 형식
+
+- 함수에 인수 1개를 넘기는 이유로 가장 흔한 경우
+    1. 인수에 질문을 던지는 경우
+        - `boolean fileExists(”MyFile”)`
+    2. 인수를 뭔가로 변환해 결과를 반환하는 경우
+        - `InputStream fileOpen(”MyFile”)`
+            - String 형 파일 이름을 InputStream으로 변환
+    - 함수 이름을 지을 때는 두 경우를 분명히 구분한다. (”명령과 조회를 구분하라!” 참조)
+- 드물게 아주 유용한 단항 함수 형식 ⇒ **이벤트**!
+    - 이벤트 함수는 입력 인수만 있다.
+        - 프로그램은 함수 호출을 이벤트로 해석해 입력 인수로 시스템 상태를 바꾼다.
+    - `passwordAttemptFailedNtimes(int attempts)`
+    - 이벤트 함수는 이벤트라는 사실이 코드에 명확하게 드러나야 한다. ⇒ 이름과 문맥 주의해서 선택
+- 지금까지 설명한 경우가 아니라면 단항 함수는 가급적 피한다.
+    - 나쁜 예 - 변환 함수에서 출력 인수를 사용하는 경우
+        - `void includeSetupPageInto(StringBuffer pageText)`
+        - 혼란스러움~
+    - 입력 인수를 반환하는 함수라면 반환 결과는 반환값으로 돌려준다.
+        - 좋은 예 : `StringBuffer transform(StringBuffer in)`
+        - 나쁜 예 : `void transform(StringBuffer out)`
+- 입력 인수를 그대로 돌려주는 함수라 할지라도 변환함수 형식을 따르는 편이 좋다.
+
+### 플래그 인수
+
+- 플래그 인수는 추하다!!!!!!!!!!
+- 왜냐고????? 함수가 한꺼번에 여러가지를 처리한다고 대놓고 공표하는 셈이니까!!!
+
+### 이항 함수
+
+- **이항함수를 사용하는 잘못된 예 : 무시되는 코드가 생기는 경우**
+    - `writeField(name)`은 `writeField(outputStream, name)`보다 이해하기 쉽다.
+        - 후자는 첫 인수를 무시해야 한다는 사실을 깨닫는 시간 필요
+            
+            ⇒ 이 사실이 문제를 일으킴. 왜???? 어떤 코드든 절대로 무시하면 안되니까, 무시한 코드에 오류가 숨어드니까!!!
+            
+- **이항 함수를 사용하는 적절한 예**
+    - `Point p = new Point(0, 0)`
+    - 여기서 인수 2개는 한 값을 표현하는 두 요소
+    - 두 요소에는 자연적인 순서도 있음.
+- 당연하게 여겨지는 이항함수 `assertionEquals(expected, actual)` 도 문제가 있다.
+    - expected 인수에 actual 값을 집어넣는 실수가 많음.
+    - 두 인수는 자연적인 순서가 없음!
+- **무조건 나쁘다는 건 아님.**
+    - 불가피한 경우도 있지~ 그래도 가능하면 단항함수로 바꾸자구~ 0.<
+- writeField 메서드 개선방안
+    - `writeField` 메서드를 `outputStream` 클래스의 구성원으로 만들어 `outputStream.writeField(name)`으로 호출하기
+    - `outputStream`을 현재 클래스 구성원 변수로 만들어 인수로 넘기지 않기
+    - `FieldWriter`라는 새 클래스 생성 → 구성자에서 `outputStream`을 받고 write 메서드 구현
+
+### 삼항 함수
+
+- 삼항 함수는 훨씬 더 이해하기 어려움
+- 좋지 않은 예시 : `assertionEquals(message, expected, actual)`
+    - 매번 함수를 볼 때마다 주춤! 아 message를 무시해야 한다는 사실을 상기해야 함.
+- 꽤괜 예시 : assertionEquals(1.0, amount, .001)
+    - 부동소수점 비교가 상대적 << 사실 잘 이해 못..
+
+### 인수 객체
+
+- 인수가 2-3개 필요하다면 일부를 독자적인 클래스 변수로 선언할 가능성을 짚어본다.
+
+```java
+Circle makeCircle(double x, double y, double radius);
+Circle makeCircle(Point center, double radius);
+```
+
+- 객체를 생성해 인수를 줄였음.
+
+### 인수 목록
+
+- 때로는 인수 개수가 가변적인 함수도 필요
+
+```java
+String.format("%s worked %.2f" hours.", name, hours);
+```
+
+- 위 예처럼 가변 인수 전부를 동등하게 취급하면 List 형 인수 하나로 취급 가능
+- 실제로 String.format 함수는 이항 함수임.
+    
+    ```java
+    public String format(String format, Object... args)
+    ```
+    
+
+### 동사와 키워드
+
+- **단항 함수는 함수와 인수가 동사 / 명사 쌍을 이뤄야 한다.**
+    - `write(name)`
+    - `writeField(name)`
+- 함수 이름에 키워드를 추가하는 형식도 가능
+    - `assertionEquals` → `assertionExpectedEqualsActual(expected, actual)`
+
+## 📌 부수 효과를 일으키지 마라!
+
+- 함수에서 한 가지를 하겠다고 약속하고선 남몰래 다른 짓도 하지 마!
+- 예를 들어 함수로 넘어온 인수나 시스템 전역 변수 수정 같은 것!
+    
+    ```java
+    public class UserValidator {
+    	private Cryptographer crytoprahpher; 
+    	
+    	public boolean checkPassword(String userName, String password) {
+    		User user = UserGateway.findByName(userName);
+    		if (user != User.NULL) {
+    			String codedPrase = user.getPhraseEncoededByPassword();
+    			String phrase = crytoprahpher.decrypt(codedPhrase, password);
+    			if("Valid Password".equals(phrase)) {
+    				Session.initialize();
+    				return true;
+    			}
+    		}
+    		return false;
+    	}	
+    }
+    ```
+    
+    - ✅ 부수 효과가 일어나는 부분 : `Session.initialize()`
+- 부수효과는 시간적인 결합을 초래함.
+    - 즉, checkPassword 함수는 특정 상황에서만 호출 가능
+- 만약 시간적인 결합이 필요하다면 함수 이름에 분명히 명시할 것
+    - `checkPassword` → `checkPasswordAndInitializeSession`
+
+### 출력 인수
+
+- 일반적으로 우리는 인수를 함수 입력으로 인식 → 출력 인수 가급적 사용 ㄴㄴ
+- 예시를 보자.
+    
+    ```java
+    appendFooters(s);
+    ```
+    
+    - 🤔 무언가에 s를 바닥글로 첨부할까? s에 바닥글을 첨부할까? 함수 선언부는 아래와 같다.
+    
+    ```java
+    public void appendFooter(StringBuffer report)
+    ```
+    
+    - 인수 `s`가 출력 인수인 걸 함수 선언부를 찾아봐야 알 수 있음.
+    - 거슬린다는 의미니까 피해야 함.
+- 객체 지향 언어에서는 출력 인수를 사용할 필요가 거의 없다.
+    - 출력 인수로 사용하라고 설계한 변수가 바로 `this`
+    - 따라서 `appendFooter`는 다음과 같이 호출하는 방식이 좋다.
+    
+    ```java
+    report.appendFooter()
+    ```
+    
+- **함수에서 상태를 변경해야 한다면 함수가 속한 객체 상태를 변경하는 방식을 택하라.**
+
+## 📌 명령과 조회를 분리하라!
+
+- 함수는 **뭔가를 수행**하거나 **뭔가에 답하거나** 둘 중 하나만 해야 한다.
+    - 객체 상태 변경 / 객체 정보 반환을 둘 다 하지 마라.
+- 예시를 보자.
+    
+    ```java
+    public boolean set(String attribute, String value);
+    // 이름이 attribute인 속성을 찾아 value로 설정한 후
+    // 성공하면 true를 만환하고 실패하면 false를 반환한다.
+    ```
+    
+    - 이 함수를 쓰면 다음과 같이 괴상한 코드가 나옴.
+    
+    ```java
+    if(set("username", "unclebob")) ...
+    ```
+    
+    - `setAndCheckIfExists`라고 바꾸는 방법도 있음. 근데 if문에 넣고 보면 여전히 어색
+    - 해결책은 명령과 조회를 분리해 혼란을 애초에 뿌리뽑는 방법
+
+## 📌 오류 코드보다 예외를 사용하라!
+
+- 명령 함수에서 오류 코드를 반환하는 방식은 명령/조회 분리 규칙을 미묘하게 위반
+- 자칫하면 if 문에서 명령을 표현식으로 사용하기 쉬운 탓
+- 나쁜 예시
+    
+    ```java
+    if (deletePage(page) == E_OK)
+    ```
+    
+    - 위 코드의 문제점
+        - 여러 단계로 중첩되는 코드를 야기함.
+        - 오류 코드를 반환하면 호출자는 오류 코드를 곧바로 처리해야 한다는 문제에 부딪힘.
+- 좋은 예시
+    
+    ```java
+    try {
+    	deletePage(page);
+    	registry.deleteReference(page.name);
+    	configKeys.deleteKey(page.name.makeKey());
+    }
+    catch (Exception e) {
+    	logger.log(e.getMessage());
+    }
+    ```
+    
+    - 오류 처리 코드가 원래 코드에서 분리되므로 코드가 깔끔해진다.
+
+### Try/Catch 블록 뽑아내기
+
+- try/catch 블록은 추함.
+    - 정상 동작과 오류처리 동작을 뒤섞는다.
+- try/catch 블록을 별도 함수로 뽑아내는 편이 좋다.
