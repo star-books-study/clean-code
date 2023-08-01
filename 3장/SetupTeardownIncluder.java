@@ -1,10 +1,14 @@
+/*
+	- 나쁜 예시를 개선한 코드
+	- 책에서 언급한 HtmlUtil.java에서 개선된 부분 주석으로 표시
+*/
 public class SetupTeardownIncluder {
   private PageData pageData;
   private boolean isSuite;
   private WikiPage testPage;
   private StringBuffer newPageContent;
   private PageCrawler pageCrawler;
- 
+
   public static String render(PageData pageData) throws Exception {
     return render(pageData, false);
   }

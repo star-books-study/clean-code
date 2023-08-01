@@ -6,70 +6,62 @@
     
     ```java
     /*
-	예시1
+        예시1
     */
-    public static String testableHtml {
-        PageData pageData,
-        boolean includeSuiteSetup
-    } throws Exception {
-        Wikipage wikiPage = pageData.getWikiPage();
-        StringBuffer buffer = new StringBuffer();
-        if (pageData.hasAttribute("Test")) {
-            if (includeSuiteSetup) {
-                WikiPage suiteSetup = 
-                    PageCrawlerImpl.getInheritedPage(
-                            SuiteResponder.SUITE_SETUP_NAME, wikiPage
-                    );
-                if (suiteSetup != null) {
-                    WikiPagePath pagePath =
-                        suiteSetup.getPageCrawler().getFullPath(suiteSetup);
-                    String pagePathName = PathParser.render(pagePath);
-                    buffer.append("!include -setup .")
-                                .append(pagePathName)
-                                .append("\\n");
-                }
-            }
-            WikiPage setup =
-                PageCrawlerImpl.getInheritedPage("SetUp", wikiPage);
-            if (setup != null) {
-                WikiPagePath setupPath =
-                    wikiPage.getPageCrawler().getFullPath(setup);
-                String setupPathName = PathParser.render(setupPath);
-                buffer.append("!include -setup .")
-                            .append(setupPathName)
-                            .append("\\n");
-            }
-        }
-        buffer.append(pageData.getContent());
-        if (pageData.hasAttribute("Test")) {
-                WikiPage teardown = 
-                    PageCrawlerImpl.getInheritedPage("TearDown", wikiPage);
-                if (teardown != null) {
-                    WikiPagePath teardownPath =
-                        suiteSetup.getPageCrawler().getFullPath(teardown);
-                    String teardownPathName = PathParser.render(teardownPath);
-                    buffer.append("!include -teardown .")
-                                .append(pagePathName)
-                                .append("\\n");
-                }
+    public class HtmlUtil {
+
+        public static String testableHtml(PageData pageData, boolean includeSuiteSetup) throws Exception {
+            WikiPage wikiPage = pageData.getWikiPage();
+            StringBuffer buffer = new StringBuffer();
+            if (pageData.hasAttribute("Test")) {
                 if (includeSuiteSetup) {
-                    WikiPage suiteTeardown = 
-                    PageCrawlerImpl.getInheritedPage(
-                            SuiteResponder.SUITE_TEARDOWN_NAME,
-                            wikiPage
-                    );
-                if (suiteTeardown != null) {
-                    WikiPagePath pagePath =
-                        suiteSetup.getPageCrawler().getFullPath(suiteTeardown);
-                    String pagePathName = PathParser.render(pagePath);
-                    buffer.append("!include -teardown .")
-                                .append(pagePathName)
-                                .append("\\n");
+                    WikiPage suiteSetup = PageCrawlerImpl.getInheritedPage(SuiteResponder.SUITE_SETUP_NAME, wikiPage);
+
+                    if (suiteSetup != null) {
+                        WikiPagePath pagePath = suiteSetup.getPageCrawler().getFullPath(suiteSetup);
+                        String pagePathName = PathParser.render(pagePath);
+                        buffer.append("!include -setup .")
+                            .append(pagePathName)
+                            .append("\n");
+                    }
+                }
+                WikiPage setup = PageCrawlerImpl.getInheritedPage("SetUp" ,wikiPage);
+                if(setup != null) {
+                    WikiPagePath setupPath = wikiPage.getPageCrawler().getFullPath(setup);
+                    String setupPathName = PathParser.render(setupPath);
+                    buffer.append("!include -setup .")
+                        .append(setupPathName)
+                        .append("\n");
                 }
             }
+            buffer.append(pageData.getContent());
+            if (pageData.hasAttribute("Test")) {
+                WikiPage tearDown = PageCrawlerImpl.getInheritedPage("TearDown", wikiPage);
+                if(tearDown != null) {
+                    WikiPagePath tearDownPath = wikiPage.getPageCrawler().getFullPath(tearDown);
+                    String tearDownPathName = PathParser.render(tearDownPath);
+                    buffer.append("\n")
+                        .append("!include -teardown .")
+                        .append(tearDownPathName)
+                        .append("\n");
+                }
+
+                if (includeSuiteSetup) {
+                    WikiPage suiteTearDown = PageCrawlerImpl.getInheritedPage(SuiteResponder.SUITE_TEARDOWN_NAME, wikiPage);
+                    if (suiteTearDown != null) {
+                        WikiPagePath pagePath = suiteTearDown.getPageCrawler().getFullPath(suiteTearDown);
+                        String pagePathName = PathParser.render(pagePath);
+                        buffer.append("!include -teardown .")
+                            .append(pagePathName)
+                            .append("\n");
+                    }
+                }
+            }
+            pageData.setContent(buffer.toString());
+            return pageData.getHtml();
         }
-        pageData.setContent(buffer.toString());
-        return pageData.getHtml();
+        
+        //...
     }
     ```
 
@@ -633,7 +625,7 @@ public enum Error {
   
     - 코드 길이가 늘어날 뿐 아니라 알고리즘이 변하면 손봐야 할 곳이 많아짐.
   
-- 예시 : 중복을 include 방법으로 없앤 [SetupTeardownIncluder.java](http://SetupTeardownIncluder.java) 참조
+- 예시 : 중복을 include 방법으로 없앤 [SetupTeardownIncluder.java](https://github.com/star-books-coffee/clean-code/blob/main/3%EC%9E%A5/SetupTeardownIncluder.java) 참조
 
 ## 📌 구조적 프로그래밍
 
@@ -669,17 +661,16 @@ public enum Error {
 - 진짜 목표는 시스템이라는 이야기를 풀어가는 데 있다는 사실을 명심하자.
 - 여러분이 작성하는 함수가 분명하고 정확한 언어로 깔끔하게 맞아 떨어져야 이야기를 풀어가기가 쉬워진다는 사실 기억하기
 
-# 추가적인 질문이나 의문점
-
-
-- 추상화 수준… 어렵군..
   
-- 예시5 코드는 한 번 더 뜯어봐야 할듯
+
 
 # 이 장에서 얻은 것
 
 
 - 함수는 한 가지만 해야 한다.
+- 함수 당 추상화 수준은 하나로!
+    - 한 함수 다음에는 추상화 수준이 한 단계 낮은 함수가 온다.
+  
 - 짧으면 짧을 수록 좋다.
   
 - 함수에서 들여쓰기 수준은 1단이나 2단을 넘어서면 안됨.
@@ -688,7 +679,94 @@ public enum Error {
   
     - 인수가 2-3개 필요하다면 일부를 독자적인 클래스 변수로 선언할 가능성을 짚어본다.
 - 길고 서술적인 이름이 짧고 어려운 이름보다 좋다.
+- 함수는 뭔가를 수행하거나 뭔가에 답하거나 둘 중 하나만 해야 한다. 
 - 함수에서 한 가지를 하겠다고 약속하고선 남몰래 다른 짓도 하지 마!
 - 오류 코드 대신 예외를 사용하자.
 - try / catch 블록을 별도 함수로 뽑아내는 편이 좋다. <<< 이거 감명 깊었음.
 - 중복 ㄴㄴ
+
+# 따로 찾아본 것
+
+
+## 함수당 추상화 수준이 하나여야 한다는 것의 의미?
+
+**🤔 추상화 수준이 하나여야 된다는 말이 추상적이어서 이해가 어려웠다,,! 그래서 좀 더 알아보기로 함.**
+
+> 참고자료
+> 
+> - https://onestone-dev.tistory.com/3
+> - https://lordofkangs.tistory.com/127
+
+함수가 한가지만 하려면 함수 내 모든 문장의 추상화 수준이 동일해야 한다. 그런데 추상화 수준이라는 게 뭔가?!
+
+### 추상화 수준의 이해
+
+우리가 함수를 만드는 이유를 도식화하면 다음과 같은 그림이 된다.
+
+https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https://blog.kakaocdn.net/dn/bp9ypF/btqDg5bq2cG/q1IRcpP4BShEjQXjXPUPq0/img.png
+
+왼쪽의 { A B C } 기능을 하는 **큰 개념**을 분해하여 A, B, C 기능을 만들었다. 그리고 나눠진 3 가지의 기능을 `단계별`로 수행하는 {}를 만들고 연결시켜줌.
+
+⇒ A, B, C가 `하나의 추상화 수준`이 되는 것.
+
+https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https://blog.kakaocdn.net/dn/b27n8Z/btruWQf9blZ/pzwTvFSz6NCTVWGuIM7WZ1/img.png
+
+### 추상화 수준의 분류
+
+- **To renderPageWithSetupsAndTeardowns, 페이지가 테스트 페이지인지 확인 후 테스트 페이지라면 설정 페이지와 해제 페이지를 넣는다. 테스트 페이지든 아니든 페이지를 HTML로 렌더링한다.**
+- 3-3 코드
+    
+    ```java
+    public static String renderPageWithSetupAndTeardowns (
+    	pageData pageData,
+    	boolean isSuite
+    ) throws Exception {
+    	if(isTestPage(pageData)) {
+    		includeSetupAndTearDownpages(pageData, isSuite);
+    	}
+    	return pageData.getHtml();
+    }
+    ```
+    
+    1. 테스트 페이지인지 확인
+    2. 설정 페이지와 해제 페이지를 넣음.
+    3. HTML 렌더링
+- 위 코드는 다음과 같이 세 가지 기능을 한다. 그러나 추상화 수준이 하나이므로 괜찮다 함.
+
+### 한 가지 추상화는 뭐시여?
+
+- 다른 예시도 함 보자. 회원가입은 세 가지 작업으로 세분화된다.
+    1. ID 유효성 검사
+    2. DB에 저장
+    3. 페이지 전환
+- 정리하면, 한 가지 기능은 **회원가입**이다.
+
+
+    - 그러므로 세 가지 기능 또한 각각 한 가지 함수로 표현되어야 한다.
+  
+    - 이와 같이 **하나의 기능을 하나의 함수로 만드는 작업이 ‘추상화’임.**
+- 두 번째 참조링크의 코드에서 중요한 부분만 가져와보자. (복붙이 안돼~
+    
+    ```java
+    @Override
+    public void mainButtonAction() throws IOException {
+    	if(!isEmptyUserName()) doJoinProcess(duplicateCheck());
+    	else setUserNameCheck("닉네임이 공백입니다.");
+    }
+    ```
+    
+    위 코드는 함수로만 코드가 구성되어있다. `추상화 수준이 높다`고 할 수 있다.
+    
+    ```java
+    private String getLoclahost() {
+    	return "localhost : " + (5500 + (int)(Math.random()*100));
+    ```
+    
+    위 코드는 ‘+’ 같은 연산 기호나 (int) 형 변환이나 Math.random() 과 같은 API 사용을 담고 있다. 구체적인 세부 구현사항을 담은 것이다. 이런 함수는 `추상화 수준이 낮다`고 말할 수 있다.
+
+
+# 뭔가 애매하게 적고 싶은 무언가
+- 정리되지 않은 처음 코드와 개선한 코드 [SetupTeardownIncluder.java](https://github.com/star-books-coffee/clean-code/blob/main/3%EC%9E%A5/SetupTeardownIncluder.java) 를 비교해봤을 때, 얼마나 많은 고민이 들어갔는지 알 수 있었음.
+- 아 이렇게 코드 짜는 거구나... 뭐가 이이뿐 코드인지는 잘 모르는 나도 딱 보인다.
+- 저자가 말했듯이 이러한 코드는 그냥 만들어지지 않고, 계속 변수명 바꾸고 클래스로 만들고 메서드 짧게 만들고... 등등 수많은 노력이 필요함.
+- 처음부터 잘 짜도록 노력해야겠지만, 너무 스트레스를 받지는 말자구~!
