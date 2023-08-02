@@ -66,7 +66,61 @@
 - 명심) 정말로 좋은 주석은, 주석을 달지 않을 방법을 찾아낸 주석임.
 
 ### 법적인 주석
+## 📌 좋은 주석
 
-```java
-룰루랄라~
-```
+- 어떤 주석은 필요하거나 유익함.
+- 명심) 정말로 좋은 주석은, 주석을 달지 않을 방법을 찾아낸 주석임.
+
+### 법적인 주석
+
+- 예시 : FitNess에서 모든 소스파일 첫머리에 추가한 표준 주석 헤더
+    - (요즘 IDE는 주석 헤더 자동으로 축소해 코드만 표시함.)
+    
+    ```java
+    // Copyright (C) 2003,2004,2005 by Object Mentor, Inc. All right reserved.
+    // GNU General License 버전 2 이상을 따르는 조건으로 배포한다.
+    ```
+    
+- 꼭 첫 머리에 들어가는 주석이 계약 조건이나 법적인 정보일 필요 X
+
+### 정보를 제공하는 주석
+
+- 때로는 **기본적인 정보**를 주석으로 제공하면 편리하다.
+- 예시1  : 추상 메서드가 반환할 값을 설명
+    
+    ```java
+    // 테스트 중인 Responder 인스턴스를 반환한다.
+    protected abstract Responder responderInstance();
+    ```
+    
+    - 더 개선한 예시 : 가능하면 함수 이름에 정보를 담는 편이 더 좋음.
+        
+        ```java
+        protected abstract Responder responderBeingTested();
+        ```
+        
+- 예시2 : 코드에서 사용한 정규표현식이 시각과 날짜를 뜻한다고 설명
+    
+    ```java
+    // kk:mm:ss EEE, MMM dd, yyyy 형식이다.
+    Pattern timeMatcher = Pattern.complie(
+    	"\\d*:\\d* \\w*, \\w*, \\d*, \\d*");
+    ```
+    
+    - 이왕이면 시각과 날짜를 변환하는 클래스를 만들어 코드를 옮겨주면 더 좋고 깔끔하겠다.
+
+### 의도를 설명하는 주석
+
+- 때때로 주석은 구현을 이해하게 도와주는 선을 넘어 결정에 깔린 의도까지 설명
+- 흥미로운 예제
+    - 두 객체를 비교할 때 저자는 다른 어떤 객체보다 자기 객체에 높은 순위를 주기로 결정했다.
+    
+    ```java
+    public int compareTo(Object o)
+    {
+    	if(o instanceof WikipagePath)
+    	{
+    		WikiPagePath p = (WikiPagePath) o;
+    		String compressedName = StringUtil.join(names, "");
+    		String 
+    ```
