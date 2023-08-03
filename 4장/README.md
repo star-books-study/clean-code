@@ -111,16 +111,192 @@
 
 ### 의도를 설명하는 주석
 
-- 때때로 주석은 구현을 이해하게 도와주는 선을 넘어 결정에 깔린 의도까지 설명
+**때때로 주석은 구현을 이해하게 도와주는 선을 넘어 결정에 깔린 의도까지 설명한다.**
+
 - 흥미로운 예제
-    - 두 객체를 비교할 때 저자는 다른 어떤 객체보다 자기 객체에 높은 순위를 주기로 결정했다.
+    
+    두 객체를 비교할 때 저자는 다른 어떤 객체보다 **자기 객체에 높은 순위를 주기로 결정**했다.
+    
+    - 원래 예시
+        
+        ```java
+        public int compareTo(Object o)
+        {
+        	if(o instanceof WikipagePath)
+        	{
+        		WikiPagePath p = (WikiPagePath) o;
+        		String compressedName = StringUtil.join(names, "");
+        		String compressedArgumentName = StringUtil.join(p.names, "");
+        		return compressedName.compareTo(compressedArgumentName);
+        	}
+        	return 1; // 오른쪽 유형이므로 정렬 순위가 더 높다.
+        }
+        ```
+        
+    - 더 나은 예시
+        
+        ```java
+        public void testConcurrendAddWidgets() throws Exception {
+        	WidgetBuilder widgetBuilder = 
+        		new WidgetBuilder(new Class[]{BoldWidget.class});
+        	String text = "'''bold text'''";
+        	parentWidget parent =
+        		new BoldWidget(new MockWidgetRoot(), "'''bold text'''");
+        	AtomicBoolean failFlag = new AtomicBoolean();
+        	failFlag.set(false);
+        	
+        	// 스레드를 대량 생선하는 방법으로 어떻게든 경쟁 조건을 만들려 시도한다.
+        	for(int i = 0; i < 25000; i++) {
+        		WidgetBuilderThread widgetBuilderThread =
+        			new WidgetBuilderThread(widgetBuilder, text, parent, failFlag);
+        		Thread thread = new Thread(widgetBuilderThread);
+        		thread.start();
+        	}
+        	assertEquals(false, failFlag.get());
+        }
+        ```
+        
+        (이해가 안감…. 둘이 의도가 좀 다른 것 같은데…………)
+        
+
+### 의미를 명료하게 밝히는 주석
+
+**때때로 모호한 인수나 반환값은 그 의미를 읽기 좋게 표현하면 이해하기 쉬워진다.**
+
+인수나 반환값이 표준 라이브러리나 변경하지 못하는 코드에 속한다면 으미를 명료하게 밝히는 주석이 유용
+
+- 예시
     
     ```java
-    public int compareTo(Object o)
+    public void testCompareTo() throws Exception
     {
-    	if(o instanceof WikipagePath)
-    	{
-    		WikiPagePath p = (WikiPagePath) o;
-    		String compressedName = StringUtil.join(names, "");
-    		String 
+    	WikipagePath a = PathParser.parse("PageA");
+    	WikipagePath ab = PathParser.parse("PageA.PageB");
+    	WikipagePath b = PathParser.parse("PageB");
+    	WikipagePath aa = PathParser.parse("PageA.PageA");
+    	WikipagePath bb = PathParser.parse("PageB.PageB");
+    	WikipagePath ba = PathParser.parse("PageB.PageA");
+    
+    	assertTrue(a.compareTo(a) == 0); // a == a
+    	assertTrue(a.compareTo(b) != 0); // a != b
+    	assertTrue(ab.compareTo(ab) == 0); // ab == ab
+    	assertTrue(a.compareTo(b) == -1); // a < b
+    	assertTrue(aa.compareTo(ab) == 0); // aa == ab
+    	...
+    }
     ```
+    
+- But 의미를 명료히 밝히는 주석이 위험한 이유
+    - 그릇된 주석을 달아놓을 위험 상당히 높음.
+  
+    - 주석이 올바른지 검증 어려움.
+- 위와 같은 주석을 달 때에는 더 나은 방법이 없는지 고민하고 각별히 주의
+
+### 결과를 경고하는 주석
+
+다른 프로그래머에게 결과를 경고할 목적으로 주석 사용하기도 함.
+
+- 예시
+    
+    특정 테스트 케이스를 꺼야하는 이유를 설명하는 주석
+    
+    ```java
+    // 여유 시간이 충분하지 않다면 실행하지 마십시오.
+    public void _testWithReallyBigFile()
+    {
+    	writeLinesToFile(10000000);
+    	
+    	response.setBody(testFile);
+    	response.readyToSend(this);
+    	String responseString = output.toString();
+    	assertSubString("Content-Length: 1000000000", responseString);
+    	assertTrue(byTesSent > 1000000000);
+    }
+    ```
+    
+    - 물론 요즘에는 `@Ignore` 속성을 이용해 테스트 케이스를 꺼버림.
+  
+    - 구체적인 설명은 `@Ignore` 속성에 문자열로 넣어줌.
+        - `@Ignore("실행이 너무 오래 걸린다.")`
+  
+    - 더 적절한 코드
+    
+    ```java
+    public static SimpleDateFormat makeStandardHttpDateFormat()
+    {
+    	// SimpleDateFormat은 스레드에 안전하지 못하다.
+    	// 따라서 각 인스턴스를 독립적으로 생성해야 한다.
+    	SimpleDateformat df = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z");
+    	df.setTimeXone(TimeZone.getTimeZone("GMT"));
+    	return df;
+    }
+    ```
+    
+    - 정적 초기화 함수를 사용하려던 열성적인 프로그래머가 주석 때문에 실수를 면할 수 있는 사례
+
+### TODO 주석
+
+‘앞으로 할 일’을 //TODO 주석으로 남겨두면 편할 때도 있음.
+
+```java
+// TODO-MdM 현재 필요하지 않다.
+// 체크아웃 모델을 도입하면 함수가 필요 없다.
+protected VersionInfo makeVersion() throws Exception
+{
+	return null;
+}
+```
+
+- **TODO 주석이 유용할 때는?**
+    - 더 이상 필요 없는 기능을 삭제하라는 알림
+    - 누군가에게 문제를 봐달라는 요청
+
+
+    - 더 좋은 이름을 떠올려달라는 부탁
+    - 앞으로 발생할 이벤트에 맞춰 코드를 고치라는 주의
+- 단, 나쁜 코드를 나마겨놓는 핑계가 되어서는 안됨.
+
+
+- 주기적으로 TODO 주석을 점검해 없애도 괜찮은 주석은 없애자.
+
+### 중요성을 강조하는 주석
+
+**자칫 대수롭지 않다고 여겨질 뭔가의 중요성 강조**
+
+```java
+String listItemContent = match.group(3).trim();
+// 여기서 trim()은 정말 중요하다. trim 함수는 문자열에서 시작 공백을 제거한다
+// 문자열에 시작 공백이 있으면 다른 문자열로 인식되기 때문이다.
+new ListItemWidget(this, listItemContent, this.level + 1);
+return buildList(text.substring(match.end());
+```
+
+### 공개 API에서 Javadocs
+
+- 설명이 잘된 공개 API는 참으로 유용
+    - Javadocs가 좋은 예
+  
+- 공개 API를 구현한다면 반드시 훌륭한 Javadocs를 작성한다.
+    - 하지만 여느 주석과 마찬가지로 Javadocs 역시 잘못된 정보 전달 가능성 O
+
+## 📌 나쁜 주석
+
+대다수 주석이 이 범주에 속함.
+
+### 주절거리는 주석
+
+주절주절주절주절
+
+- 특별한 이유 없이 의무감으로 마지못해 주석을 단다면 시간낭비!
+    
+    > 주석을 달기로 결정했다면 충분한 시간을 들여 최고의 주석을 달도록 노력한다.
+    > 
+- 주절주절주석 예시
+
+```java
+public void loadProperties()
+{
+	try
+	{
+		String propertiesPath = propertiesLocation + "/" + PROPERTIES_FILE
+```
