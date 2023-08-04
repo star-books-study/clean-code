@@ -292,11 +292,177 @@ return buildList(text.substring(match.end());
     > 주석을 달기로 결정했다면 충분한 시간을 들여 최고의 주석을 달도록 노력한다.
     > 
 - 주절주절주석 예시
+    ```java
+    public void loadProperties()
+    {
+        try
+        {
+            String propertiesPath = propertiesLocation + "/" + PROPERTIES_FILE;
+            FileInputStream propertiesStream = new FileInputStream(propertiesPath);
+            loadedProperties.load(propertiesStream);
+        }
+        catch(IOExeption e)
+        {
+            // 속성 파일이 없다면 기본값을 모두 메모리로 읽어 들였다는 의미다.
+        }
+    }
+    ```
+
+뭔 뜻일까?
+
+- `IOException`이 발생하면 속성 파일이 없다 → 기본값을 메모리로 읽어들인 상태
+
+- 근데 누가 기본값을 메모리로 읽어들인건지 알 수 없음.
+    - `loadProperties.load`를 호출하기 전?
+    - `loadProperties.load`가 예외를 잡아 기본값을 읽어들인 후 예외를 던져주나?
+  
+    - `loadProperties.load`가 파일을 읽어들이기 전에 모든 기본값부터 읽어들이나?
+    - 그냥 catch 블록 비워놓기 뭐해서 몇 마디 끄적인 거?
+- 답을 알아내려면 다른 코드를 뒤져보는 수 밖에 없는 코드 → 독자와 제대로 소통하지 못하는 주석임.
+
+### 같은 이야기를 중복하는 주석
+
+- 주석이 코드보다 더 많은 정보를 제공하지 못하는 예시
+    - 헤더에 달린 주석이 같은 코드 내용을 그대로 중복한다.
+        
+        ```java
+        // this.closed가 true일 때 반환되는 유틸리티 메서드다.
+        // 타임아웃에 도달하면 예외를 던진다.
+        public synchronized void waitForClose(final long timeoutMillis)
+        throws Exception
+        {
+        	if(!closed)
+        	{
+        		wait(timeoutMillis);
+        		if(!closed)
+        			throw new Exception("MockResponseSender could not be closed");
+        	}
+        }
+        ```
+        
+- 쓸모없고 중복된 Javadocs가 많은 예시(Tomcat에서 가져온 코드)
+    
+    ```java
+    public abstract class ContainerBase
+    	implements Container, Lifecycle, Pipeline,
+    	MBeanRegistration, Serializable {
+    	
+    	/** 
+    	* 이 컨포넌트의 프로세서 지연값
+    	*/
+    	protected int backgroundProcessorDelay = -1;
+    	
+    	/** 
+    	* 이 컨포넌트를 지원하기 위한 생명주기 이벤트
+    	*/
+    	protected LifecycleSupport lifecycle =
+    		new LifecycleSupport(this);
+    
+    	/** 
+    	* 이 컨포넌트를 위한 컨테이너 이벤트 Listener
+    	*/
+    	protected ArrayList listeners = new ArrayList();
+    
+    	// 뒤에 이런 식으로 변수 선언 겁나 많이 하고 주석은 다 달음.
+    ```
+    
+    - 코드만 지저분하고 정신 없게 만듦.
+
+### 오해할 여지가 있는 주석
+
+- 이 코드 다시 보자. 오해할 여지가 있음.
+    
+    ```java
+    // this.closed가 true일 때 반환되는 유틸리티 메서드다.
+    // 타임아웃에 도달하면 예외를 던진다.
+    public synchronized void waitForClose(final long timeoutMillis)
+    throws Exception
+    {
+    	if(!closed)
+    	{
+    		wait(timeoutMillis);
+    		if(!closed)
+    			throw new Exception("MockResponseSender could not be closed");
+    	}
+    }
+    ```
+    
+    - this.closed가 true로 변하는 순간에 메서드는 반한되지 않는다.
+  
+    - this.closed가 true**여야** 메서드는 반환된다.
+        - 아니면 무조건 타임아웃을 기다렸다 this.closed가 그래도 true가 **아니면** 예외를 던진다.
+    - (이게 무슨 말장난…? 아 그러니까 this.closed가 true로 변하는 그 찰나가 아니라, timeoutMillis 만큼 다~~ 기다렸다가 true인 거 검사되면 그 때 반환을 하네
+  
+- 이렇게 코드 짜면 true로 변하는 순간! 함수가 반환되는 줄 알고 경솔하게 함수 호출할 수도 있음.
+
+### 의무적으로 다는 주석
+
+- 모든 함수에 Javadocs를 달거나 모든 변수에 주석을 달아야 한다는 규칙은 어리석기 그지 없음.
+- 괴물 코드
+    
+    ```java
+    /**
+    	*
+    	* @param title CD 제목
+    	* @param author CD 저자
+    	* @param tracks CD 트랙 숫자
+    	* @param durationInMinutes CD 길이(단위 : 분)
+    	*/
+    public void addCD(String title, String author, 
+    									int tracks, int durationInMinutes) {
+    	CD cd = new CD();
+    	cd.title = title;
+    	cd.author = author;
+    	cd.tracks = tracks;
+    	cd.duration = durationInMinutes;
+    	cdList.add(cd);
+    }
+    ```
+    
+
+### 이력을 이록하는 주석
+
+- 모듈을 편집할 때마다 모듈 첫 머리에 주석 추가할 때도 있음.
+
+- 그럼 모듈 첫 머리 주석은 지금까지 모듈에 가한 변경을 모두 기록하는 일종의 일지 혹은 로그가 된다.
+- 예전에는 모든 모듈 첫머리에 변경 이력을 기록하고 관리하는 관계가 바람직했음.(소스코드 관리 시스테밍 없었으니까)
+- 이제는 혼란만 가중할 뿐.
+
+### 있으나 마나 한 주석
+
+너무 당연한 사실을 언급하며 새로운 정보를 제공하지 못하는 주석
 
 ```java
-public void loadProperties()
-{
-	try
-	{
-		String propertiesPath = propertiesLocation + "/" + PROPERTIES_FILE
+/**
+	* 기본 생성자
+	*/
+protected AnnualDateRule() {
+}
 ```
+
+```java
+/** 월 중 일자 */
+private int dayOfMonth;
+```
+
+```java
+/**
+	* 월 중 일자를 반환한다.
+	*
+	* @return 월 중 일자
+	*/
+public int getDayOfMonth() {
+	return dayOfMonth;
+}
+```
+
+- 위와 같은 주석은 지나친 참견이라 개발자가 주석을 무시하는 습관에 빠짐
+    - 결국은 코드가 바뀌면서 주석은 거짓말로 변한다.
+- 다음 예시를 보자.
+    - 첫 번째 주석은 적절해 보임.
+  
+    - 두 번째 주석은 전혀 쓸모가 없음.
+    
+    ```java
+    
+    ```
