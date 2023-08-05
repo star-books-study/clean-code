@@ -460,9 +460,85 @@ public int getDayOfMonth() {
     - 결국은 코드가 바뀌면서 주석은 거짓말로 변한다.
 - 다음 예시를 보자.
     - 첫 번째 주석은 적절해 보임.
-  
     - 두 번째 주석은 전혀 쓸모가 없음.
     
     ```java
-    
+    private void startSending()
+    {
+    	try
+    	{
+    		doSending();
+    	}
+    	catch(SocketException e)
+    	{
+    		// 정상. 누군가 요청을 멈췄다.
+    	}
+    	catch(Exception e)
+    	{
+    		try
+    		{
+    			response.add(ErrorResponser.makeExceptionString(e));
+    		}
+    		catch(Exception e1)
+    		{
+    			// 이게 뭐야!
+    		}
+    	}
+    }
     ```
+    
+    - try/catch 블록을 짜다 너무 짜증났나 봄.
+    - 있으나 마나 한 주석으로 분풀이하는 대신 프로그래머가 코드 구조를 개선했더라면 짜증낼 필요가 없었을 것…
+- 다음과 같이 try/catch 블록을 독자적인 함수로 만드는 데 노력을 쏟았어야 했음.
+    
+    ```java
+    private void startSending()
+    {
+    	try
+    	{
+    		doSending();
+    	}
+    	catch(SocketException e)
+    	{
+    		// 정상. 누군가 요청을 멈췄다.
+    	}
+    	catch(Exception e)
+    	{
+    		addExceptionAndCloseResponse(e);
+    	}
+    }
+    
+    private void addExceptionAndCloseResponse(Exception e)
+    {
+    	try
+    	{
+    		response.add(ErrorResponseder.makeExceptionString(e));
+    		response.closeAll();
+    	}
+    	catch(Exception e1)
+    	{
+    	}
+    }
+    ```
+    
+
+### 무서운 잡음
+
+- 때로는 JavaDocs도 잡음임.
+- 단지 문서를 제공해야 한다는 잘못된 욕심으로 탄생한 잡음
+
+```java
+/** The name. */
+private String name;
+
+/** The version. */
+private String version;
+
+/** The licenceName. */
+private String licenseName;
+
+/** The version. */
+private String info;
+```
+
+- 잘라서 붙여넣기한 오류도 보임.
