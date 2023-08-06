@@ -542,3 +542,319 @@ private String info;
 ```
 
 - 잘라서 붙여넣기한 오류도 보임.
+
+### 함수나 변수로 표현할 수 있다면 주석을 달지 마라
+
+- 나쁜 예
+    
+    ```java
+    // 전역 목록 <smodule>에 속하는 모듈이 우리가 속한 하위 시스템에 의존하는가?
+    if (smodule.getDependSubsystems().contains(subSysMod.getSubSystem())
+    ```
+    
+- 좋은 예
+    
+    ```java
+    ArrayList moduleDependees = smodule.getDependSubsystems();
+    String ourSubSystem = subSysMod.getSubSystem();
+    if (moduleDependees.contains(ourSubSystem))
+    ```
+    
+
+### 위치를 표시하는 주석
+
+```java
+// Actions //////////////////////////
+```
+
+- 가독성만 낮추므로 제거해야 마땅
+- 너무 자주 사용하지 않는다면 ㄱㅊ
+
+### 닫는 괄호에 다는 주석
+
+- 중첩이 심하고 장황한 함수라면 의미가 있을지도 모르겠지만 작고 캡슐화된 (우리가 선호하는) 함수에는 잡음!
+- 닫는 괄호에 주석을 달아야겠다는 생각이 든다면 대신에 함수를 줄여라
+
+```java
+public class wc {
+	public satic void main(String[] args) {
+		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+		String line;
+		int lineCount = 0;
+		int charCount = 0;
+		int wordCount = 0;
+		try {
+			while((line = in.readLine()) != null) {
+				lineCount++;
+				charCount += line.length();
+				String words[] = line.split("\\W");
+				wordCount += words.length;
+			} // while
+			System.out.println("wordCount = " + wordCount);
+			System.out.println("lineCount = " + lineCount);
+			System.out.println("charCount = " + charCount);
+		} // try
+		catch (IOException e) {
+			System.out.println("Error: " + e.getMessage());
+		} // catch
+	} // main
+}
+```
+
+### 공로를 돌리거나 저자를 표시하는 주석
+
+```java
+/* 릭이 추가함 */
+```
+
+- 누가 언제 무엇을 추가했는지 소스코드 관리 시스템은 다 알고 있음. 저런 거 추가 ㄴㄴ
+- 이런 주석은 그냥 오랫동안 코드에 방치되어 점차 부정확하고 쓸모없는 정보로 변하기 쉬움.
+- 저런 정보는 소스코드 관리 시스템에 저장하는 편이 좋음.
+
+### 주석으로 처리한 코드
+
+주석으로 처리한 코드만큼 밉살스러운 관행도 드물다.
+
+```java
+대충 주석으로 처리된 코드
+```
+
+- 좋지 않은 이유
+    - 다른 사람들이 지우기를 주저함. → 쓸모없는 코드가 점차 쌓여감.
+- 예전과 다르게 지금은 소스코드 관리 시스템을 사용하기 때문에 이젠 필요 없음.
+
+### HTML 주석
+
+> 소스코드에서 HTML 주석은 혐오 그 자체다.
+> 
+
+```java
+/**
+	* 적합성 테스트를 수행하기 위한 과업
+	* 이 과업은 적합성 테스트를 수행해 결과를 출력한다.
+	* <p/>
+	* <pre>
+	* 용법:
+	* &lt;taskder name=&quot;execute-fitnesse-tests&quot;
+	*     classname=&quot;fitnesse.ant.ExecuteFitnesseTestsTask&quot;
+
+어쩌구...
+```
+
+### 전역 정보
+
+- 주석을 달아야 한다면 근처에 있는 정보만 설명하자.
+- 시스템 전반적인 정보를 기술하지 말자. 맥락 상 안맞다.
+- 예시
+    
+    ```java
+    /**
+     * 적합성 테스트가 동작하는 포트: 기본값은 <b>8082</b>.
+     * @param fitnessePort
+     */
+    public void setFitnessePort(int fitnessePort) {
+      this.fitnewssePort = fitnessePort;
+    }
+    ```
+    
+
+### 너무 많은 정보
+
+- 주석에다 흥미로운 역시나 관련 없는 정보를 장황하게 늘어놓지 말자. 꼭 필요한 정보만 주석으로 달자.
+
+### 모호한 관계
+
+- 주석과 주석이 설명하는 코드는 둘 사이 관계가 명백해야 한다.
+- 예시
+    
+    ```java
+    /**
+     * 모든 픽셀을 담을 만큼 충분한 배열로 시작한다(여기에 필터 바이트를 더한다).
+     * 그리고 헤더 정보를 위해 200바이트를 더한다.
+     */
+     this.pngBytes = new byte[((this.width + 1) * this.height * 3) + 200];
+    ```
+    
+    - 필터 바이트란 무엇일까? +1과 관련 있을 까? * 3과 관련이 있을까? 아니면 둘 다? 한 픽셀이 한 바이트인가? 200을 추가한 이유는 뭘까?
+- 주석을 다는 목적은 코드만으로 설명이 부족해서다. 주석 자체가 다시 설명을 요구하면 안됨.
+
+### 함수 헤더
+
+짧은 함수는 긴 설명이 필요 없다. 짧고 한 가지만 수행하여 이름을 잘 붙인 함수가 주석으로 헤더를 추가한 함수보다 훨씬 좋다.
+
+### 비공개 코드에서 Javadocs
+
+- 공개 API는 Javadocs가 유용하지만 공개하지 않을 코드라면 Javadoc는 **쓸모없다.**
+- 시스템 내부에 속한 클래스와 함수에 Javadocs 생성할 필요 Xx
+
+### 예제
+
+- 리팩토링 전 GeneratePrimes.java
+    
+    (예전에는 상당수가 이런 코드를 보면서 주석을 잘 달았다고 생각했다고 함!)
+    
+    ```java
+    /**
+     * This class Generates prime numbers up to a user specified
+     * maximum. The algorithm used is the Sieve of Eratosthenes.
+     * <p>
+     * Eratosthenes of Cyrene, b. c. 276 BC, Cyrene, Libya --
+     * d. c. 194, Alexandria.  The first man to calculate the
+     * circumference of the Earth. Also known for working on
+     * calendars with leap years and ran the library at Alexandria.
+     * <p>
+     * The algorithm is quite simple. Given an array of integers
+     * starting at 2. Cross out all multiples of 2. Find the next
+     * uncrossed integer, and cross out all of its multiples.
+     * Repeat untilyou have passed the square root of the maximum
+     * value.
+     *
+     * @author Alphonse
+     * @version 13 Feb 2002 atp
+     */
+     
+    public class GeneratePrimes
+    {
+      /**
+       * @param maxValue is the generation limit.
+       */
+      public static int[] generatePrimes(int maxValue)
+      {
+        if (maxValue >= 2) // the only valid case
+        {
+          // declarations
+          int s = maxValue + 1; // size of array
+          boolean[] f = new boolean[s];
+          int i;
+          // initialize array to true.
+          for (i = 0; i < s; i++)
+            f[i] = true;
+     
+          // get rid of known non-primes
+          f[0] = f[1] = false;
+     
+          // sieve
+          int j;
+          for (i = 2; i < Math.sqrt(s) + 1; i++)
+          {
+            if (f[i]) // if i is uncrossed, cross its multiples.
+            {
+              for (j = 2 * i; j < s; j += i)
+                f[j] = false; // multiple is not prime
+            }
+          }
+     
+          // how many primes are there?
+          int count = 0;
+          for (i = 0; i < s; i++)
+          {
+            if (f[i])
+              count++; // bump count.
+          }
+     
+          int[] primes = new int[count];
+     
+          // move the primes into the result
+          for (i = 0, j = 0; i < s; i++)
+          {
+            if (f[i])             // if prime
+              primes[j++] = i;
+          }
+     
+          return primes; // return the primes
+        }
+        else // maxValue < 2
+        return new int[0]; // return null array if bad input.
+      }
+     
+      public static void main(String[] args) {
+        for (int i: generatePrimes(50)) {
+          System.out.print(i + " ");
+        }
+      }
+    }
+    ```
+    
+- 리팩토링 후 PrimesGenerator.java
+    
+    ```java
+    /**
+     * 이 클래스는 사용자가 지정한 최대 값까지의 소수를 구한다.
+     * 알고리즘은 에라스토테네스의 체다.
+     * 2에서 시작하는 정수 배열을 대상으로 작업한다.
+     * 처음으로 남아 있는 정수를 찾아 배수를 모두 제거한다.
+     * 배열에 더 이상 배수가 없을 때까지 반복한다.
+    */
+     
+    public class PrimeGenerator {
+      private static boolean[] crossedOut;
+      private static int[] result;
+     
+      public static int[] generatePrimes(int maxValue) {
+        if (maxValue < 2)
+          return new int[0];
+        else {
+          uncrossIntegersUpTo(maxValue);
+          crossOutMultiples();
+          putUncrossedIntegersIntoResult();
+          return result;
+        }
+      }
+     
+      private static void uncrossIntegersUpTo(int maxValue) {
+        crossedOut = new boolean[maxValue + 1];
+        for (int i = 2; i < crossedOut.length; i++)
+          crossedOut[i] = false;
+      }
+     
+      private static void crossOutMultiples() {
+        int limit = determineIterationLimit();
+        for (int i = 2; i <= limit; i++)
+          if (notCrossed(i))
+            crossOutMultiplesOf(i);
+      }
+     
+      private static int determineIterationLimit() {
+        // 배열에 있는 모든 배수는 배열 크기의 제곱근보다 작은 소수의 인수다.
+    		// 따라서 이 제곱근보다 더 큰 숫자의 배수는 제거할 필요가 없다.
+        double iterationLimit = Math.sqrt(crossedOut.length);
+        return (int) iterationLimit;
+      }
+     
+      private static void crossOutMultiplesOf(int i) {
+        for (int multiple = 2 * i;
+             multiple < crossedOut.length;
+             multiple += i)
+          crossedOut[multiple] = true;
+      }
+     
+      private static boolean notCrossed(int i) {
+        return crossedOut[i] == false;
+      }
+     
+      private static void putUncrossedIntegersIntoResult() {
+        result = new int[numberOfUncrossedIntegers()];
+        for (int j = 0, i = 2; i < crossedOut.length; i++)
+          if (notCrossed(i))
+            result[j++] = i;
+      }
+     
+      private static int numberOfUncrossedIntegers() {
+        int count = 0;
+        for (int i = 2; i < crossedOut.length; i++)
+          if (notCrossed(i))
+            count++;
+     
+        return count;
+      }
+     
+      public static void main(String[] args) {
+        for (int i : generatePrimes(50)) {
+          System.out.print(i + " ");
+        }
+      }
+    }
+    ```
+    
+- **첫 번째 주석** : 중복으로 보일 순 있지만 알고리즘을 이해하기 쉬워지는 주석임. → 남겨둠.
+- **두 번째 주석 :** 거의 확실히 필요. 루프 한계값으로 제곱근을 사용한 이유 설명
