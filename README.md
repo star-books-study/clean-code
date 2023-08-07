@@ -14,9 +14,9 @@
 | 1장         | 깨끗한 코드    | `완료`   | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/1%EC%9E%A5) |        
 | 2장         | 의미있는 이름  | `완료` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/2%EC%9E%A5)         |
 | 3장         | 함수            | `완료` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/3%EC%9E%A5)         |
-| 4장         |                | `진행중` |          |
+| 4장         | 주석            | `완료` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/4%EC%9E%A5)         |
+| 5장         | 형식 맞추기     | `진행중` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/5%EC%9E%A5)         |
 | 6장         |                | `미완료` |          |
-| 5장         |                | `미완료` |          |
 | 7장         |                | `미완료` |          |
 | 8장         |                | `미완료` |          |
 | 9장         |                | `미완료` |          |
