@@ -71,4 +71,43 @@
     - **마지막에는 가장 저차원 함수와 세부 내역이 나옴.**
 
 > 한 면을 채우는 기사는 거의 없다.
->
+
+### 개념은 빈 행으로 분리해라
+
+- 생각 사이에는 빈 행을 분리해야 마땅하다.
+- 개념을 빈 행으로 구분한 좋은 예
+    
+    ```java
+    package fitnesse.wikitext.widgets;
+    
+    import java.util.regex.*;
+    
+    public class BoldWidget extends ParentWidget {
+    		public static final String REGEXP = "'''.+?'''";
+    		private static final Pattern pattern = Pattern.compile("'''(.+?)'''",
+    			Pattern.MULTILINE + Pattern.DOTALL
+    	);
+    	
+    	public BoldWidget(ParentWidget parent, String text) throws Exception {
+    		super(parent);
+    			Matcher match = pattern.matcher(text);
+    			match.find();
+    			addChildWidgets(match.group(1));
+    	}
+    	
+    	public String render() throws Exception {
+    		StringBuffer html = new StringBuffer("<b>");
+    		html.append(childHtml()).append("<b>");
+    		return html.toString();
+    	}
+    }
+    ```
+    
+    - 패키지 선언부, import 문, 각 함수 사이에 빈 행이 들어감.
+- 빈 행은 새로운 개념을 시작한다는 시각적 단서
+
+### 세로 밀집도
+
+- 줄바꿈이 개념을 분리한다면 세로 밀집도는 연관성을 의미함.
+- 서로 밀집한 코드의 행은 세로로 가까이 놓여야 함.
+- 나쁜 예
