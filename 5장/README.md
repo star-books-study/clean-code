@@ -111,3 +111,95 @@
 - 줄바꿈이 개념을 분리한다면 세로 밀집도는 연관성을 의미함.
 - 서로 밀집한 코드의 행은 세로로 가까이 놓여야 함.
 - 나쁜 예
+    
+    ```java
+    public class ReporterConfig {
+    	/**
+    	* 리포터 리스너의 클래스 이름
+    	*/
+    	private String m_className;
+    	
+    	/**
+    	* 리포터 리스너의 속성
+    	*/
+    	private List<Property> m_properties = new ArrayList<Property>();
+    	public void addProperty(Property property) {
+    		m_properties.add(property);
+    	}
+    }
+    ```
+    
+    - 의미 없는 주석으로 두 인스턴스 변수를 떨어뜨려 놓음.
+  
+- 개선한 예
+    
+    ```java
+    public class ReporterConfig {
+    	private String m_className;
+    	private List<Property> m_properties = new ArrayList<Property>();
+    
+    	public void addProperty(Property property) {
+    		m_properties.add(property);
+    	}
+    }
+    ```
+    
+    - 코드가 **한 눈에** 들어옴.
+
+
+    - 변수 두 개에 메서드 하나인 클래스라는 사실이 드러남.
+
+### 수직 거리
+
+> 함수 연관 관계와 동작 방식을 이해하려고 이 함수에서 저 함수로 오가며 소스 파일을 위아래로 뒤지는 등 뺑뺑이를 돌았으나 결국은 미로 같은 코드 때문에 혼란만 가증된 경험이 있는가?
+> 
+- 서로 밀접한 개념은 세로로 가까이 둬야 한다.
+- 하지만 타당한 근거가 없다면 서로 밀접한 개념은 한 파일에 속해야 마땅하다.
+
+
+    - **이게 바로 protected 변수를 피해야 하는 이유**
+
+
+- 같은 파일에 속할 정도로 밀접한 두 개념은 세로 거리로 연관성 표현
+    - 연관성 : 한 개념을 이해하는 데 다른 개념이 중요한 정도
+
+
+    - 연관성이 깊은 두 개념이 멀리 떨어져 있으면 코드를 읽는 사람이 소스 파일과 클래스를 여기저기 뒤지게 됨.
+
+**변수선언**
+
+- 변수는 사용하는 위치에 최대한 가까이 선언한다. (?? 자바에서만인가?
+- 우리가 만든 함수는 짧음 → 지역 변수는 각 함수 맨 처음에 선언
+- 예시1
+    
+    ```java
+    private static void readPreferences() {
+    	InputStream is= null;
+    	try {
+    		is= new FileInputStream(getPreferencesFile());
+    		setPreferences(new Properties(getPreferences()));
+    		getPreferences().load(is);
+    	} catch (IOException e) {
+    		try {
+    			if(is != null)
+    			is.close();
+    		} catch(IOException i1) {
+    		}
+    	}
+    }
+    ```
+    
+- 예시2
+    - 목표를 제어하는 변수는 흔히 루프문 내부에 선언
+    
+    ```java
+    public int countTestCases() {
+    	int count= 0;
+    	for(Test each : tests)
+    		count += each.countTestCases();
+    	return count;
+    }
+    ```
+    
+- 예시3
+    - 블록 상단이나 루프 직전에 변수 선언
