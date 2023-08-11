@@ -208,6 +208,144 @@
 
 - 클래스 맨 처음에 선언
 - 변수간 세로로 거리를 두지 않는다.
-- 인스턴스 변수 선언 위치는 논쟁 부분
+- 인스턴스 변수 선언 위치는 논쟁 분분
     - C++은 인스턴스 변수를 클래스 마지막에 선언
-    - 자바는 보통 클래스 맨 처음에 인ㄴ스턴스 변수 선언
+    - 자바는 보통 클래스 맨 처음에 인스턴스 변수 선언
+- 인스턴스 변수 선언이 꽁꽁 숨겨진 예시(나쁜 예)
+    
+    ```java
+    public class TestSuite implements Test {
+    	static public Test createTest(Class<? extends TestCase> theClass,
+    																String nmae) {
+    		...
+    	}
+    	
+    	public static Constructor<? extends TestCase>
+    	getTestConstructor(Class<? extends TestCase> theClass)
+    	throws NoSuchMethodException {
+    		...
+    	}
+    	
+    	public static Test warning(final String message) {
+    		...
+    	}
+    	
+    	private static String excpetionToString(Throwable t) {
+    		...
+    	}
+    	
+    	private String fName;
+    	private Vector<Text> fTests = new Vector<Text>(10);
+    	
+    	public TestSuite() {
+    	}
+    	
+    	public TestSuite(final Class<? extends TestCase> theClass) {
+    		...
+    	}
+    	
+    	public TestSuite(Class<? extends TestCase> theClass, String name) {
+    		...
+    	}
+    	... ...  
+    }
+    ```
+    
+
+**종속 함수**
+
+- 한 함수가 다른 함수를 호출한다면 → 두 함수 세로로 가까이 배치
+- 가능하다면 호출하는 함수를 호출되는 함수보다 먼저 배치
+    
+    ⇒ 프로그램이 자연스럽게 읽힘.
+    
+- 규칙을 일관적으로 적용하면 예측 가능
+
+```java
+public class WikipageResponder implements SecureResponder {
+	protected WikiPage page;
+	protected PageData pageData;
+	protected String PateTitle;
+	protected Request request;
+	protected PageCrawler crawler;
+
+	public Response makeResponse(FitNesseContext content, Request request)
+		throws Exception {
+		String pageName = getPageNameOrDefault(request, "FrontPage");
+		loadPage(pageName, context);
+		if (page == null)
+			return notFoundResponse(context, request);
+		else
+			return makePageResponse(context);
+
+	private String getPageNameOrDefault(Request request, String defaultPageName)
+	{
+		String pageName = request.getResource();
+		if (StringUtil.isBlank(pageName))
+			pageName = defaultPageName;
+		
+		return pageName;
+	}
+
+	protected void loadPage(String resource, FitNesseContext context)
+		throws Exception {
+		WikiPagePath path = PathParser.parse(resource);
+		crawler = context.root.getPageCrawler();
+		// 생략
+	
+	private Response notFoundResponse(FitNesseContext context, Request request)
+		throws Exception {
+		return new NotFoundResponder().makeResponse(context, request);
+	}
+
+	private SimpleResponse makePageResponse(FitNesseContext context)
+		throws Exception {
+		pageTitle = PathParser.render(crawler.getFullPath(page));
+		String html = makeHtml(context);
+
+		SimpleResponse response = new SimpleResponse();
+		response.setMaxAge(0);
+		response.setContent(html);
+		return response;
+	}
+```
+
+**개념의 유사성**
+
+- 개념적인 친화도가 높을수록 코드를 가까이 배치한다.
+- 친화도가 높은 요인
+    - 한 함수가 다른 홈수를 호출해 생기는 직접적인 종속성
+    - 변수와 그 변수를 사용하는 함수
+
+
+    - **비슷한 동작을 수행하는 일군의 함수**
+    
+    ```java
+    public class Assert {
+    	static public void assertTrue(String message, boolean condition) {
+    		if (!condition)
+    			fail(message);
+    	}
+    
+    	static public void assertTrue(boolean condition) {
+    		assertTrue(null, condition);
+    	}
+    
+    	static public void assertFalse(String message, boolean condition) {
+    		assertTrue(message, !condition);
+    	}
+    
+    	static public void assertFalse(boolean condition) {
+    		assertFalse(null, condition);
+    	}
+    
+    ...
+    ```
+    
+    - 위 세 함수들은 개념적인 친화도 높음
+
+
+        - 명명법이 똑같고 기본 기능이 유사하고 간단
+
+
+    - 종속적인 관계가 없더라도 가까이 배치할 함수들
