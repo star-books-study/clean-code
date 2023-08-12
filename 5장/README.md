@@ -349,3 +349,183 @@ public class WikipageResponder implements SecureResponder {
 
 
     - 종속적인 관계가 없더라도 가까이 배치할 함수들
+
+### **세로 순서**
+
+- 일반적으로 `호출되는 함수`를 `호출하는 함수`보다 나중에 배치
+    
+    ⇒ 소스코드 모듈이 고차원에서 저차원으로 자연스럽게 내려감. 
+    
+- like 신문기사 🗞️
+    - 중요한 개념을 가장 먼저 표현
+    - 가장 중요한 개념을 표현할 때에는 세세한 사항 최대한 배제
+
+## 📌 **가로 형식 맞추기**
+
+- 한 행은 가로로 얼마나 길어야 적당할까????? (넘나 궁금
+- 일반적인 프로그램에서 행 길이
+    
+    https://oopy.lazyrockets.com/api/v2/notion/image?src=https://s3-us-west-2.amazonaws.com/secure.notion-static.com/76b1e629-5c30-43c4-af52-80eacdcf7242/Untitled.png&blockId=31a3e6d5-dcae-4fb7-bb64-08134ac91cd7
+    
+    - 규칙적임.
+    - 45자 근처가 제일 규칙적
+    - 20-60자 사이는 모든 값이 총 행 수의 1%
+        - __20자-60자 사이인 행이 총 행수의 총 행수의 40%에 달함.
+    - 80자 이후부터는 행 수 급격히 감소
+        
+        **⇒ 프로그래머는 명백하게 짧은 행을 선호한다.**
+        
+- 저자 개인적으로는 120자 정도로 행 길이 제한
+
+### **가로 공백과 밀집도**
+
+- 가로로는 공백을 사용해 밀접한 개념과 느슨한 개념을 표현함.
+- 공백 활용 예시
+    
+    ```java
+    private void measuerLine(String line) {
+    	lineCount++;
+    	int lineSize = line.length();
+    	totalChars += lineSize;
+    	lineWidthHistogram.addLine(lineSize, lineCount);
+    	recordWidestLine(lineSize);
+    }
+    ```
+    
+    - 할당 연산자 사이의 공백 → 왼쪽 요소와 오른쪽 요소가 분명히 나뉨.
+    - 함수 이름과 이어지는 괄호 사이에는 공백 X → 함수와 인수는 서로 밀접함.
+    - 공백을 넣으면 한 개념이 아니라 별개로 보임.
+        - 함수 호출 코드에서 괄호 안 인수는 공백으로 분리
+- 공백 활용 예시2
+    
+    연산자 우선순위를 강조하기 위해서도 공백 사용
+    
+    ```java
+    public class Quadratic {
+    	public static double root1(double a, double b, double c) {
+    		double determinant = derterminant(a, b, c);
+    		return (-b + Math.sqrt(determinant)) / (2*a);
+    	}
+    	
+    	public static double root2(int a, int b, int c) {
+    		double determinant = derterminant(a, b, c);
+    		return (-b + Math.sqrt(determinant)) / (2*a);
+    	}
+    	private static double determinant(double a, double b, double c) {
+    		return b*b - 4*a*c;
+    	}
+    ```
+    
+    - 승수 사이에는 공백이 없음. (곱셈이 가장 우선순위가 높기 때문)
+    - 항 사이에는 공백이 들어감. (덧셈과 뺄셈은 우선순위가 곱셈보다 낮기 때문)
+    
+    (오 곱셈에도 무조건 띄어쓰기 했는데 이게 더 낫구나)
+    
+    - 근데 IDE에서 공백 없애는 경우가 흔함.
+
+### **가로 정렬**
+
+- 가로정렬이 뭐냐면 대충 이런거임
+    
+    ```java
+    public class FitNesseExpediter implements ResponseSender {
+        private     Socket         socket;
+        private     InputStream    input;
+        private     OutputStream   output;
+        private     Reques         request;      
+        private     Response       response; 
+        private     FitNesseContex context; 
+        protected   long           requestParsingTimeLimit;
+        private     long           requestProgress;
+        private     long           requestParsingDeadline;
+        private     boolean        hasError;
+    
+    	public FitNesseExpediter(Socket          s,
+    							 FitNesseContext context) throws Exception
+    	{
+    		this.context =            context;
+    		socket =                  s;
+    		input =                   s.getInputStream();
+    		output =                  s.getOutputStream();
+    		requestParsingTimeLimit = 10000;
+    	}
+    ```
+    
+- 가로정렬의 문제점
+    - 코드의 엉뚱한 부분 강조 → 진짜 의도가 가려짐.
+        - ex) 변수 유형은 무시하고 변수 이름부터 읽게 됨.
+        - ex) 할당 연산자는 보이지 않고 오른쪽 피연산자에 눈이 감.
+    - IDE는 대다수가 위와 같은 정렬을 무시함.
+- 이제는 선언문과 할당문을 별도로 정렬하지 않음.
+    - 정렬하지 않으면 오히려 중대한 결함을 찾기 쉬움.
+- 정렬이 필요할 정도로 목록이 길다면?
+    - 문제는 목록 **길이**지 정렬 부족이 아님.
+
+### **들여쓰기**
+
+- 우리는 계층을 표현하기 위해 코드를 들여씀.
+- 프로그래머는 이런 들여쓰기 체계에 크게 의존
+
+**들여쓰기 무시하기**
+
+- 때로는 간단한 if문, while문, 짧은 함수에서 들여쓰기 규칙을 무시하고픈 유혹이 생김. (맞아!!!!!
+- 저자는 항상 원점으로 돌아가 들여쓰기 넣음.
+- 나쁜 예
+    
+    다음과 같이 한 행에 범위를 뭉뚱그린 코드는 피함.
+    
+    ```java
+    public class CommentWidget extends TextWidget {
+        public static final String REGEXP = "^#[^\r\n]*(?:(?:\r\n)|\n|\r)?";
+    
+        public CommentWidget(ParentWidget parent, String text){super(parent, text);}
+        public String render() throws Exception {return ""; } 
+    }
+    ```
+    
+- 좋은 예
+    
+    ```java
+    public class CommentWidget extends TextWidget {
+        public static final String REGEXP = "^#[^\r\n]*(?:(?:\r\n)|\n|\r)?";
+    
+        public CommentWidget(ParentWidget parent, String text) {
+    			super(parent, text);
+    		}
+    
+        public String render() throws Exception {
+    			return "";
+    		}
+    }
+    ```
+    
+
+### 가짜 범위
+
+- 저자는 빈 while문이나 for문 구조 선호 Xx
+- 피하지 못할 때는 빈 블록을 올바로 들여쓰고 괄호로 감쌈.
+- while 문 끝에 세미콜론(;) 하나를 살짝 덧붙인 코드로 수없이 골탕먹은 저자,,
+- 세미콜론은 새 행에다가 제대로 들여써서 넣어줘야 눈에 띔.
+    
+    ```java
+    while (dis.read(buf, 0, readBufferSize) != -1)
+    ;
+    ```
+    
+
+## 📌 팀 규칙
+
+> 개개인이 따로국밥처럼 맘대로 짜대는 코드는 피해야 함.
+
+
+![](https://mp-seoul-image-production-s3.mangoplate.com/597979_1629857347523897.jpg?fit=around|738:738&crop=738:738;*,*&output-format=jpg&output-quality=80)
+
+- 팀은 한 가지 규칙에 합의해야 함. 그리고 모든 팀원은 그 규칙을 따라야 함.
+- 어디에 괄호를 넣을지, 들여쓰기는 몇 자로 할지, 클래스와 변수와 메서드 이름은 어떻게 지을지 등등 결정
+    - 우리가 정한 규칙으로 IDE 코드 형식기를 설정한 후 지금까지 사용
+- 스타일은 일관적이고 매끄러워야 함.
+- 한 소스파일에서 봤던 형식이 다른 소스파일에도 쓰이리라는 신뢰감을 독자에게 줘야 함.
+
+## 📌 밥 아저씨의 형식 규칙
+
+![](https://mblogthumb-phinf.pstatic.net/20160526_126/emo-art_1464269073322MHPQj_JPEG/zLNFIBtisESk634049407784855842.jpg?type=w800)
