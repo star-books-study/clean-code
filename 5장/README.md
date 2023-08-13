@@ -529,3 +529,113 @@ public class WikipageResponder implements SecureResponder {
 ## 📌 밥 아저씨의 형식 규칙
 
 ![](https://mblogthumb-phinf.pstatic.net/20160526_126/emo-art_1464269073322MHPQj_JPEG/zLNFIBtisESk634049407784855842.jpg?type=w800)
+저자가 사용하는 규칙 : 코드 자체가 최고의 구현 표준 문서가 되는 예
+
+```java
+public class CodeAnalyzer implementes JavaFileAnalysis {
+	private int lineCount;
+	private int maxLineWidth;
+	private int widestLineNumber;
+	private LineWidthHistogram lineWidthHistogram;
+	private int totalChars;
+
+	public CodeAnalyzer() {
+		lineWidthHistogram = new LinewidthHistogram();
+	}
+
+	public static List<File> findJavaFiles(File parentDirectory) {
+		List<File> files = new ArrayList<File>();
+		findJavaFiles(parentDirectory, files);
+		return files;
+	}
+
+	private static void findJavaFiles(File parentDirectory, List<File> files) {
+		for (File file : parentDirectory.listFiles()) {
+			if (file.getName().endswith(".java"))
+				files.add(file);
+			else if (file.isDirectory())
+				findJavaFiles(file, files);
+		}
+	}
+
+	public void analyzeFile(File javaFile) throw Exception {
+		BufferReader br = new BufferReader(new FileReader(javaFile));
+		String line;
+		while((line = br.readLine()) != null)
+			measureLine(line);
+	}
+
+	private void measureLine(String line) {
+		lineCount++;
+		int lineSize = line.length();
+		totalChars += lineSize;
+		lineWidthHistogram.addLine(lineSize, lineCount);
+		recordWidestLine(lineSize);
+	}
+
+	private void recordWidestLine(int lineSize) {
+		if(lineSize > maxLineWidth) {
+			maxLineWidth = lineSize;
+			widestLineNumber = lineCount;
+		}
+	}
+
+	public int getLineCount() {
+		return lineCount;
+	}
+
+	public int getMaxLineWidth() {
+		return maxLineWidth;
+	}
+
+	public int getWidestLineNumber() {
+		return widestLineNumber;
+	}
+
+	public LineWidthHistogram getLineWidthHistogram() {
+		return lineWidthHistogram;
+	}
+
+	public double getMeanLineWidth() {
+		return (double)totalChars/lineCount;
+	}
+	
+	public int getMidianLineWidth() {
+		Integer[] sortedWidths = getSortedWidths();
+		int cumulativeLineCount = 0;
+		for (int width : sortedWidths) {
+			cumulativeLineCount += lineCountForWidth(width);
+			if (cumulativeLineCount > lineCount/2)
+				return width;
+		}
+		throw new Error("Cannot get here");
+	}
+	
+	private int lineCountForWidth(int width) {
+		return lineWidthHistogram.getLinesforWidth(width).size();
+	}
+	
+	private Integer[] getSortedWidth() {
+		Set<Integer> widths = lineWidthHistogram.getWidths();
+		Integer[] sortedWidths = (widths.toArray(new Integer[0]));
+		Arrays.sort(sortedWidths);
+		return sortedWidths;
+	}
+}
+```
+
+# 이 장에서 얻은 것
+
+---
+
+- 적절한 행 길이를 유지하자.
+- **코드는 신문 기사처럼!**
+    - 간단하게
+    - 중요한 내용 먼저! 세부사항은 뒤에!
+- 연관있는 개념들은 세로로 가까이 놓아야 함.
+- 호출되는 함수를 호출하는 함수보다 나중에 배치하자.
+- 가로로 얼마나 길어야 할까? → 최대한 짧게. 길어도 120자는 넘기지 말자.
+- 변수 선언문은 아 여기에 변수가 선언되겠구나~ 가 예상이 가능하도록 배치
+- 연산자 우선순위 강조를 위해 공백을 사용하자. ex) 승수에는 공백이 없음.
+- 가로 정렬 ㄴㄴ
+- if문, while문 등에서 웬만하면 들여쓰기 넣자.
