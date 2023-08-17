@@ -79,3 +79,35 @@ public interface Vehicle {
 
 - 객체는 추상화 뒤로 자료를 숨긴 채 자료를 다루는 함수만 공개
 - 자료구조는 자료를 그대로 공개하며 별다른 함수는 제공 Xx
+
+
+- 두 개념(객체, 자료구조)는 사실상 정반대
+- 예시 : 절차적인 도형 클래스
+    - Geometry 클래스는 세 가지 도형 클래스를 다룬다.
+    - 각 도형 클래스는 간단한 자료 구조 → 아무 메서드도 제공하지 않음.
+    - 도형이 동작하는 방식은 Geometry 클래스에서 구현
+    
+    ```java
+    public class Square {
+    	public Point topLeft;
+    	public double side;
+    }
+    
+    public class Rectangle {
+    	public Point topLeft;
+    	public double height;
+    	public double width;
+    }
+    
+    public class Circle {
+    	public Point center;
+    	public double radius;
+    }
+    
+    public class Geometry {
+    	public final double PI = 3.1415926253589793;
+    	
+    	public double area(Object shape) throws NoSuchShapeException 
+    	{
+    		if (shape instanceof Square
+    ```
