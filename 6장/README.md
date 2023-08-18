@@ -84,30 +84,48 @@ public interface Vehicle {
 - 두 개념(객체, 자료구조)는 사실상 정반대
 - 예시 : 절차적인 도형 클래스
     - Geometry 클래스는 세 가지 도형 클래스를 다룬다.
+
+
     - 각 도형 클래스는 간단한 자료 구조 → 아무 메서드도 제공하지 않음.
     - 도형이 동작하는 방식은 Geometry 클래스에서 구현
     
-    ```java
-    public class Square {
-    	public Point topLeft;
-    	public double side;
-    }
-    
-    public class Rectangle {
-    	public Point topLeft;
-    	public double height;
-    	public double width;
-    }
-    
-    public class Circle {
-    	public Point center;
-    	public double radius;
-    }
-    
-    public class Geometry {
-    	public final double PI = 3.1415926253589793;
-    	
-    	public double area(Object shape) throws NoSuchShapeException 
-    	{
-    		if (shape instanceof Square
-    ```
+		```java
+		public class Square {
+			public Point topLeft;
+			public double side;
+		}
+
+		public class Rectangle {
+			public Point topLeft;
+			public double height;
+			public double width;
+		}
+
+		public class Circle {
+			public Point center;
+			public double radius;
+		}
+
+		public class Geometry {
+			public final double PI = 3.1415926253589793;
+			
+			public double area(Object shape) throws NoSuchShapeException 
+			{
+				if (shape instanceof Square) {
+					Square s = (Square)shape;
+					return s.side * s.side;
+				}
+				else if (shape instanceof Rectangle) {
+					Rectangle r = (Rectangle)shape;
+					return r.height * r.width;
+				}
+				else if (shape instanceof Circle) {
+					Circle c = (Circle)shape;
+					return PI = c.radius * c.radius;
+				}
+				throw new NoSuchShapeException();
+			}
+		}
+		```
+
+		- 객체지향 프로그래머가 위 코드를 읽고 코웃음을 칠 수도 있음.
