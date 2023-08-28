@@ -75,5 +75,27 @@
 
 ## 📌 Try-Catch-Finally 문부터 작성하라
 - try-catch-finally 문에서 try 블록에 들어가는 코드를 실행하면 어느 시점에서든 실행이 중단된 후 catch 블록으로 넘어갈 수 있다.
-- 어떤 면에서 try 블록은 트랜잭션과 비슷
-    - try 블록에서 무슨 일이 생기든 catch 블록은 프로그램 상태를 일관성 있게 유지해야 함.
+- try-catch-finally 문으로 작성하면 try 블록에서 무슨 일이 생기든지 호출자가 기대하는 상태를 정의하기 쉬워짐.
+- 예제 : 파일이 없으면 예외를 던지는지 알아보는 단위 테스트
+    
+    ```java
+    @Test(expected = StorageException.class)
+    public void retrieveSectionShouldThrowOnInvalidFileName() {
+    	sectionStore.retrieveSection("invalid - file");
+    }
+    ```
+    
+    단위 테스트에 맞춰 코드를 구현함.
+    
+    ```java
+    public List<RecordedGrip> retrieveSectioin(String sectionName) {
+    	// 실제로 구현할 때까지 비어 있는 더미를 반환한다.
+    	return new ArrayList<RecordedGrip>();
+    }
+    ```
+    
+    그런데 코드가 예외를 던지지 않으므로 단위 테스트 실패…. 잘못된 파일의 접근을 시도하게 구현을 변경하자. 밑에는 예외 던지는 코드
+    
+    ```java
+    
+    ```
