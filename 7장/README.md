@@ -97,5 +97,12 @@
     그런데 코드가 예외를 던지지 않으므로 단위 테스트 실패…. 잘못된 파일의 접근을 시도하게 구현을 변경하자. 밑에는 예외 던지는 코드
     
     ```java
-    
-    ```
+	public List<RecordedGrip> retrieveSection(String sectionName) {
+		try {
+			FileInputStream stream = new FileInputStream(sectionName)
+		} catch (Exception e) {
+			throw new StorageException("retrieval error", e);
+		}
+		return new ArrayList<RecordedGrip>();
+	}
+	```
