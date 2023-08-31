@@ -114,3 +114,6 @@
 
 - checked vs unchecked
     - 처음엔 checked 예외가 멋진 아이디어로 여겨짐.
+    - 지금은 아님.
+- 확인된 예외의 단점
+    - OCP를 위반
