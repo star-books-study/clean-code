@@ -140,5 +140,152 @@
 
 - 오류 분류 방법은 다양함
 - 가장 중요한 건 **오류를 잡아내는 방법**
+- 오류를 형편 없이 분류한 사례
+    
+    ```java
+    ACMEPort port = new ACMEPort(12);
+    
+    try {
+    	port.open();
+    } catch (DeviceResponseException e) {
+    		reportPortError(e);
+    		logger.log("Device response exception", e);
+    } catch (ATM1212UnlockedException e) {
+    		reportPortError(e);
+    		logger.log("Unlocked Exception", e);
+    } catch (GMXError e) {
+    		reportPortError(e);
+    		logger.log("Device response exception");
+    } finally {
+    	...
+    }
+    ```
+    
+    - 대다수 상황에서 우리가 오류를 처리하는 방식은 비교적 일정
+        
+        1) 오류 기록
+        
+        2) 프로그램을 계속 수행해도 좋은지 확인
+        
+- 위 경우는 예외에 대응하는 방식이 예외 유형과 무관하게 거의 동일 → 간결하게 고치기 쉬움.
+    - 호출하는 라이브러리 API를 감싸면서 예외 유형 하나를 반환하면 됨.
+        
+        ```java
+        LocalPort port = new LocalPort(12);
+        try {
+        	port.open();
+        } catch (PortDeviceFailure e) {
+        	reportError(e);
+        	logger.log(e.getMessage(), e);
+        } finally {
+        	...
+        }
+        ```
+        
+        여기서 LocalPort 클래스는 ACMEPort 클래스가 던지는 클래스 예외를 잡아 변환하는 Wrapper 클래스
+        
+        ```java
+        public class LocalPort {
+        	private ACMEPort innerPort;
+        
+        	public LocalPort(int portNumber) {
+        		innerPort = new ACMEPort(portNumber);
+        	}
+        
+        	public void open() {
+        		try {
+        			innerPort.open();
+        		} catch (DeviceResponseException e) {
+        			throw new PortDeviceFailure(e);
+        		} catch (ATM1212UnlockedException e) {
+        	...
+        ```
+        
+    - 이런 Wrapper 클래스는 매우 유용
+    - 실제로 외부 API를 사용할 때는 감싸기 기법이 최선
+        
+        ⇒ 의존성이 크게 줄어듦.
+        
+        ⇒ 특정 업체가 API를 설계한 방식에 발목 잡히지 않음.
+        
 
-### 오류를 형편 없이 분류한 사례
+## 📌 정상 흐름을 정의하라
+
+- 앞 절에서 충고한 지침을 충실히 따르면 비즈니스 논리와 오류 처리가 잘 분리된 코드가 나옴.
+    - 하지만 그러다 보면 오류 감지가 프로그램 언저리로 밀려남.
+    - 독자적인 예외 던지고, 코드 위에 처리기를 정의해 중단된 계산 처리
+- 그러나 때로는 중단이 적합하지 않은 때도 있다.
+- 예제 : 비용 청구 애플리케이션에서 총계를 게산하는 허술한 코드
+    
+    ```java
+    try {
+    	MealExpenses expenses = expeseReportDAO.getMeals(employee.getID());
+    	m_total += expenses.getTotal();
+    } catch(MealExpensedNotFound e) {
+    	m_total += getMealPerDiem();
+    }
+    ```
+    
+    클래스나 객체가 예외적인 상황을 캡슐화 해서 처리한다
+    
+    ```java
+    MealExpenses expenses = expenseReportDAO.getMeals(employee.getID());
+    m_total += expenses.getTotal();
+    
+    ```
+    
+    ExpenseReportDAO를 고쳐 언제나 MealExpense 객체를 반환하게 한다. 청구한 식비가 없다면 일일 기본 식비를 반환하는 MealExpense 객체를 반환한다.
+    
+    ```java
+    public class PerDiemMealExpenses implements MealExpenses {
+    	public int getTotal() {
+    		// 기본값으로 일일 기본 식비를 반환한다.
+    	}
+    }
+    ```
+    
+
+## 📌 null을 반환하지 마라
+
+**null을 반환하고 이를 `if(object != null)`으로 확인하는 방식은 나쁘다.**
+
+- null 대신 예외를 던지거나 특수 사례 객체(ex. `Collections.emptyList()`)를 반환하라
+- 사용하려는 외부 API가 null을 반환한다면 Wrapper 를 구현해 예외를 던지거나 특수 사례 객체를 반환하라
+
+### 수정 전
+
+```java
+List<Employee> employees = getEmployees();
+if (employees != null) {
+	for(Employee e : employees) {
+		totalPay += e.getPay();
+	}
+}
+```
+
+### 수정 후
+
+`getEmployees`가 null 대신 빈 리스트를 반환한다.
+
+```java
+List<Employee> employees = getEmployees();
+for(Employee e : employees) {
+	totalPay += e.getPay();
+}
+```
+
+자바의 `Collections.emptyList()`
+
+```java
+public List<Employee> getEmployees() {
+	if ( ...직원이 없다면... ) {
+		return Collections.emptyList();
+	}
+}
+```
+
+## 📌 null을 전달하지 마라
+
+- 메서드 인수로 null을 전달하는 방식은 더 나쁨.
+    - 예외를 던지거나 assert 문을 사용할 수는 있다.
+    - 하지만 애초에 null을 전달하는 경우는 금지하는 것이 바람직하다.
