@@ -26,3 +26,23 @@ public class SuperDashboard extends JFrame implements MetaDataUser {
 ```
 
 - 만약에 SuperDashboard가 목록 10-2와 같이 메서드 몇 개만 포함된다면?
+    
+    ```java
+    // 목록 10-2 충분히 작을까?
+    public class SuperDashboard extends Jframe implements MetaDataUser {
+    	public Component getLastForcusedComponent()
+    	public void setLastFocused(Component lastFocused)
+    	public int getMajorVersionNumber()
+    	public int getMinorVersionNumber()
+    	public int getBuildNumber()
+    }
+    ```
+    
+    - 메서드가 다섯 개 정도면 괜찮아보이지만 아님.
+    - 메서드 수가 작음에도 **책임이 너무 많다.**
+- **클래스 이름은 해당 클래스 책임을 기술해야 함**
+    - 작명은 클래스 크기를 줄이는 첫 번째 관문
+- 클래스 이름이 모호하다면 클래스 책임이 너무 많아서임.
+    - Processor, Manager, Super 등과 같이 모호한 단어가 있다?
+        - 클래스에다 여러 책임을 떠안겼다는 증거
+- 클래스 설명은 if, or, but 등을 제외하고 25단어 내외로 가능해야 함.
