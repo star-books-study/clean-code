@@ -16,12 +16,12 @@
 | 3장         | 함수           | `완료` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/3%EC%9E%A5)         |
 | 4장         | 주석           | `완료` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/4%EC%9E%A5)         |
 | 5장         | 형식 맞추기    | `완료` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/5%EC%9E%A5)         |
-| 6장         | 객체와 자료구조 | `진행중` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/6%EC%9E%A5)         |
-| 7장         |                | `미완료` |          |
-| 8장         |                | `미완료` |          |
-| 9장         |                | `미완료` |          |
-| 10장        |                | `미완료` |          |
-| 11장        |                | `미완료` |          |
+| 6장         | 객체와 자료구조 | `완료` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/6%EC%9E%A5)         |
+| 7장         | 오류 처리       | `완료` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/7%EC%9E%A5)         |
+| 8장         |  경계           | `완료` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/8%EC%9E%A5)         |
+| 9장         |  단위 테스트    | `완료` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/9%EC%9E%A5)         |
+| 10장        |  클래스         | `진행중` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/10%EC%9E%A5)        |
+| 11장        |  시스템         | `진행중` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/11%EC%9E%A5)        |
 | 12장        |                | `미완료` |          |
 | 13장        |                | `미완료` |          |
 | 14장        |                | `미완료` |          |
