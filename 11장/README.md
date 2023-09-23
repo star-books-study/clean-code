@@ -56,3 +56,11 @@
 - 즉, 애플리케이션은 main이나 객체가 생성되는 과정을 전혀 모른다. 단지 모든 객체가 적절히 생성되었다고 가정한다.
 
 ## 팩토리
+객체가 생성되는 시점을 애플리케이션이 결정해야 하는 경우엔 팩토리 형식을 사용할 수 있다.
+
+![](https://user-images.githubusercontent.com/37948906/125300462-03ce8400-e365-11eb-8354-3f8bbbf3563a.png)
+
+- 장점
+    - Application은 FactoryImpl을 받아 필요할 때 Configured Object를 생성한다.
+    - Application은 Configured Object가 언제 생성되는지 알 수가 없다.
+    - 생성과 사용이 분리되었다.
