@@ -22,7 +22,7 @@
 | 9장         |  단위 테스트    | `완료` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/9%EC%9E%A5)         |
 | 10장        |  클래스         | `진행중` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/10%EC%9E%A5)        |
 | 11장        |  시스템         | `진행중` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/11%EC%9E%A5)        |
-| 12장        |                | `미완료` |          |
+| 12장        |  창발성          | `진행중` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/12%EC%9E%A5)       |
 | 13장        |                | `미완료` |          |
 | 14장        |                | `미완료` |          |
 | 15장        |                | `미완료` |          |
