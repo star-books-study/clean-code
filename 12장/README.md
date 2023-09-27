@@ -50,3 +50,27 @@ boolean isEmpty() {
 	return 0 == size();
 }
 ```
+- 다음 코드를 보자.
+
+```java
+public void scaleToOneDimension(
+ float desiredDimension, float imageDimensiion) {
+	if(Math.abs(desiredDimension - imageDimension) < errorThreshold)
+		return;
+	float scalingFactor = desiredDimension / imageDimension;
+	scalingFactor = (float)(Math.floor(scalingFactor * 100) * 0.01f);
+	
+	RenderedOp newImage = ImageUtilities.getScaledImage(
+	  image, scalingFactor, scalingFactor);
+		image.dispose();
+		System.gc();
+		image = newImage;
+	}
+	public synchronized void rotate(int degrees) {
+		RenderedOp newImage = ImageUtilities.getRotatedImage(
+		  image, degrees);
+		image.dispose();
+		System.gc();
+		image = new Image();
+	}
+```
