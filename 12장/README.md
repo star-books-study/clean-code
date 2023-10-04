@@ -74,3 +74,4 @@ public void scaleToOneDimension(
 		image = new Image();
 	}
 ```
+- 일부 코드가 동일하다. 중복을 제거하자.
