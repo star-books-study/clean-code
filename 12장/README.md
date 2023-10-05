@@ -75,3 +75,81 @@ public void scaleToOneDimension(
 	}
 ```
 - 일부 코드가 동일하다. 중복을 제거하자.
+
+```java
+public void scaleToOneDimension(
+ float desiredDimension, float imageDimensiion) {
+	if(Math.abs(desiredDimension - imageDimension) < errorThreshold)
+		return;
+	float scalingFactor = desiredDimension / imageDimension;
+	scalingFactor = (float)(Math.floor(scalingFactor * 100) * 0.01f);
+	replaceImage(ImageUtilites.getScaledImage(
+				image, scalingFacor, scalingFactor));
+}
+
+public synchronized void rotate(int degrees) {
+	replaceImage(ImageUtilites.getScaledImage(image, degrees));
+}
+
+private void replaceImage(RenderedOp newImage) {
+	image.dispose();
+	System.gc();
+	image = new Image();
+}
+```
+
+- 공통적인 코드를 새 메서드로 뽑고 보니 클래스가 SRP를 위반한다.
+- 다른 클래스로 옮기면 새 메서드의 가시성이 높아지겠군! 다른 팀원이 재사용할 기회 포착도 가능
+- 이런 ‘`소규모 재사용`’은 시스템 복잡도를 줄여줌.
+- `TEMPLATE METHOD` 패턴은 고차원 중복을 제거할 목적으로 자주 사용하는 기법임.
+
+```java
+public class VacationPolicy {
+	public void accureUSDivisionVacation() {
+		// 지금까지 근무한 시간을 바탕으로 휴가 일수를 계산하는 코드
+		// ...
+		// 휴가 일수가 미국 최소 법정 일수를 만족하는지 확인하는 코드
+		// ...
+		// 휴가 일수를 급여 대장에 적용하는 코드
+		// ...
+	}
+
+	public void accureEUDivisionVacation() {
+		// 지금까지 근무한 시간을 바탕으로 휴가 일수를 계산하는 코드
+		// ...
+		// 휴가 일수가 미국 최소 법정 일수를 만족하는지 확인하는 코드
+		// ...
+		// 휴가 일수를 급여 대장에 적용하는 코드
+		// ...
+	}
+}
+```
+
+- 두 코드는 거의 동일. 직원 유형에 따라 살짝 변함
+- TEMPLATE METHOD 패턴 적용
+
+```java
+abstract public class VacationPolicy {
+	public void accureVacation() {
+		calculateBaseVacationHours();
+		alterForLegalMinimum();
+		applyToPayroll();
+	}
+
+	public void calculateBaseVacationHours() { /* ... */ };
+	abstract protected void alterForLegalMinimums();
+	private void applyToPayrool() { /* ... */ };
+}
+
+public class UsVacationPolicy extends VacationPolicy {
+	@Override protected void alterForLegalMinimums() {
+		// 미국 최소 법정 일수를 사용한다.
+	}
+}
+
+public class EUVacationPolicy extends VacationPolicy {
+	@Override protected void alterForLegalMinimums() {
+		// 유럽연합 최소 법정 일수를 사용한다.
+	}
+}
+```
