@@ -153,3 +153,5 @@ public class EUVacationPolicy extends VacationPolicy {
 	}
 }
 ```
+## 📌 표현하라
+- 소프트웨어 프로젝트 비용 중 대다수는 장기적인 유지보수에 들어감.
