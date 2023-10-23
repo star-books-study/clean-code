@@ -32,3 +32,7 @@ public static void main(String[] args) {
 ### 어떻게 짰느냐고?
 
 - 처음부터 그렇게 짠 건 아님.
+
+## 📌 Args : 1차 초안
+
+- 맨 처음 짰던 Args 클래스
