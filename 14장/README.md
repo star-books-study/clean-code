@@ -36,3 +36,4 @@ public static void main(String[] args) {
 ## 📌 Args : 1차 초안
 
 - 맨 처음 짰던 Args 클래스
+### 그래서 멈췄다
