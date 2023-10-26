@@ -40,3 +40,7 @@ public static void main(String[] args) {
 - 추가할 인수 유형이 적어도 두 개는 더 있었는데 더 나빠질 것 같아서 멈춤.
 
 ### 점진적으로 개선하다
+
+### String 인수
+
+### 결론
