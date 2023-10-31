@@ -28,6 +28,18 @@ public static void main(String[] args) {
 ## 📌 Args 구현
 
 - Args 클래스를 개선하는 예시가 나와 있음.
+```java
+// 목록 14-2 Args.java
+
+public class Args {
+	private Map<Character, ArgumentMarchaler> marchalers;
+	private Set<Character> argsFound;
+	private ListIterator<String> currentArgument;
+
+	public Args(String schema, String[] args) throws ArgsException {
+		marchalers = new HashMap<Character, ArgumentMarshaler>();
+		argsFound = new HashASet<Character>();
+```
 
 ### 어떻게 짰느냐고?
 
