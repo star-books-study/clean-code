@@ -32,14 +32,49 @@ public static void main(String[] args) {
 // 목록 14-2 Args.java
 
 public class Args {
-	private Map<Character, ArgumentMarchaler> marchalers;
+	private Map<Character, ArgumentMarchaler> malshalers;
 	private Set<Character> argsFound;
 	private ListIterator<String> currentArgument;
 
 	public Args(String schema, String[] args) throws ArgsException {
 		marchalers = new HashMap<Character, ArgumentMarshaler>();
 		argsFound = new HashASet<Character>();
+
+		parseSchema(schema);
+		parseArgumentStrings(Arrays.asList(args));
+	}
+
+	private void parseSchema(String schema) throws ArgsException {
+		for (String element : schema.split(","))
+			if (element.length() > 0)
+				parseSchemaElement(element.trim());
+	}
+	
+	private void parseSchemaElement(String element) throws ArgsException {
+		char elementId = element.charAt(0);
+		String elementTail = element.substring(1);
+		validateSchemaElementId(elementId);
+		if (elementTail.length() == 0)
+			malshalers.put(elementId, new BooleanArgumentMarchaler());
+		else if (elementTail.equals("*"))
+			marshalers.put(elementId, new StringArgumentMarchaler());
+		else if (elementTail.equals("#"))
+			marshalers.put(elementId, new IntegerArgumentMarchaler());
+		else if (elementTail.equals("[*]"))
+			marshalers.put(elementId, new StringArrayArgumentMarchaler());
+		else
+			throw new ArgsException(INVALID_ARGUMENT_FORMAT, elementId, elementTail);
+		} // 어머 ArgsException 어떻게 생겼을지 궁금하다
+	
+		private void validateSchemaElementId(char elementId) throws ArgsException {
+			if (!Character.isLetter(elementId))
+				throw new ArgsException(INVALID_ARGUMENT_NAME, elementId, null);
+		}
+	
+		private void parseArgumentStrings
+
 ```
+
 
 ### 어떻게 짰느냐고?
 
