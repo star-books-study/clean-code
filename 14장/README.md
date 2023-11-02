@@ -71,7 +71,8 @@ public class Args {
 				throw new ArgsException(INVALID_ARGUMENT_NAME, elementId, null);
 		}
 	
-		private void parseArgumentStrings
+		private void parseArgumentStrings(List<String> argsList) throws ArgsException {
+			for (currentArgument = argsList.listIterator(); currentArgument.hasNext();)
 
 ```
 
