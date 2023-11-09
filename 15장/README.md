@@ -14,4 +14,9 @@
 ```java
 // 목록 15-1 ComparisionCompactorTest.java
 package junit.test.framework;
-```
+
+
+// import 문 생략
+
+public class ComparisionCompactorTest extends TestCase {
+	public void testMessage() {
