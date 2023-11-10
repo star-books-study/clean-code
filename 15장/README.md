@@ -20,3 +20,9 @@ package junit.test.framework;
 
 public class ComparisionCompactorTest extends TestCase {
 	public void testMessage() {
+		String faliure = new ComparisonCompactor(0, "b", "c").compact("a");
+		assertTrue("a expected:<[b]> but was:<[c]>".equals(failure));
+	}
+	
+	public void testStartSame() {
+		String failure = new ComparisionCompacter(1, "ba", "bc").compact(null);
