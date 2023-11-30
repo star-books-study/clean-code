@@ -2,3 +2,5 @@
 ### 서버
 
 - 다음은 서버 애플리케이션을 단순화한 버전이다
+```
+ServerSocket serverSocket
