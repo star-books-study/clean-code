@@ -48,7 +48,7 @@ public class SuperDashboard extends JFrame implements MetaDataUser {
 - 클래스 설명은 if, or, but 등을 제외하고 25단어 내외로 가능해야 함.
 
 
-## 📌 단일 책임 원칙
+### 단일 책임 원칙
 
 - 단일 책임 원칙은 클래스나 모듈을 변경할 이유가 하나, 단 하나뿐이어야 한다는 원칙
 - SRP는 ‘책임’이라는 개념을 정의하며 적절한 클래스 크기를 제시
@@ -186,7 +186,8 @@ public class Stack {
     }
     ```
     
-    - 엉망임. 최소한 여러 함수로 나눠야 마땅
+    - 들여쓰기가 심하고 이상한 변수가 많고 구조가 빡빡하게 결합되었음
+- 개선한 코드
     
     ```java
     // 10-6 PrimePrinter.java(리팩터링한 버전)
@@ -267,3 +268,162 @@ public class Stack {
         }
     }
     ```
+    
+    ```java
+    // 10-8 PrimeGenerator.java
+    package literatePrimes;
+    import java.util.ArrayList;
+    public class PrimeGenerator {
+        private static int[] primes;
+        private static ArrayList < Integer > multiplesOfPrimeFactors;
+        protected static int[] generate(int n) {
+            primes = new int[n];
+            multiplesOfPrimeFactors = new ArrayList < Integer > ();
+            set2AsFirstPrime();
+            checkOddNumbersForSubsequentPrimes();
+            return primes;
+        }
+        private static void set2AsFirstPrime() {
+            primes[0] = 2;
+            multiplesOfPrimeFactors.add(2);
+        }
+        private static void checkOddNumbersForSubsequentPrimes() {
+            int primeIndex = 1;
+            for (int candidate = 3; primeIndex < primes.length; candidate += 2) {
+                if (isPrime(candidate))
+                    primes[primeIndex++] = candidate;
+            }
+        }
+        private static boolean isPrime(int candidate) {
+            if (isLeastRelevantMultipleOfNextLargerPrimeFactor(candidate)) {
+                multiplesOfPrimeFactors.add(candidate);
+                return false;
+            }
+            return isNotMultipleOfAnyPreviousPrimeFactor(candidate);
+        }
+        private static boolean
+        isLeastRelevantMultipleOfNextLargerPrimeFactor(int candidate) {
+            int nextLargerPrimeFactor = primes[multiplesOfPrimeFactors.size()];
+            int leastRelevantMultiple = nextLargerPrimeFactor * nextLargerPrimeFactor;
+            return candidate == leastRelevantMultiple;
+        }
+        private static boolean
+        isNotMultipleOfAnyPreviousPrimeFactor(int candidate) {
+            for (int n = 1; n < multiplesOfPrimeFactors.size(); n++) {
+                if (isMultipleOfNthPrimeFactor(candidate, n))
+                    return false;
+            }
+            return true;
+        }
+        private static boolean
+        isMultipleOfNthPrimeFactor(int candidate, int n) {
+            return
+            candidate == smallestOddNthMultipleNotLessThanCandidate(candidate, n);
+        }
+        private static int
+        smallestOddNthMultipleNotLessThanCandidate(int candidate, int n) {
+            int multiple = multiplesOfPrimeFactors.get(n);
+            while (multiple < candidate)
+                multiple += 2 * primes[n];
+            multiplesOfPrimeFactors.set(n, multiple);
+            return multiple;
+        }
+    }
+    ```
+    
+
+## 📌 변경하기 쉬운 클래스
+
+- 깨끗한 시스템은 클래스를 체계적으로 정리해 변경에 수반하는 위험을 낮춘다
+- 어떤 변경이든 클래스를 손대면 다른 코드를 망가뜨릴 잠정적인 위험이 존재한다
+- 개선 전 코드
+    
+    ```java
+    // 10-9 Sql.java
+    public class Sql {
+        public Sql(String table, Column[] columns)
+        public String create()
+        public String insert(Object[] fields)
+        public String selectAll()
+        public String findByKey(String keyColumn, String keyValue)
+        public String select(Column column, String pattern)
+        public String select(Criteria criteria)
+        public String preparedInsert()
+        private String columnList(Column[] columns)
+        private String valuesList(Object[] fields, final Column[] columns) 
+        private String selectWithCriteria(String criteria)
+        private String placeholderList(Column[] columns)
+    }
+    ```
+    
+    - 클래스를 변경할 이유가 2가지이므로 SRP를 위반한다
+        - 새로운 SQL문 추가 시
+        - 기존 SQL문 수정 시
+    - selectWithCriteria 메서드는 select 문을 처리할 때만 사용
+- 개선 후 코드 (닫힌 클래스 집합)
+    
+    ```java
+    // 10-10 Sql.java
+    abstract public class Sql {
+        public Sql(String table, Column[] columns)
+        abstract public String generate();
+    }
+    
+    public class CreateSql extends Sql {
+        public CreateSql(String table, Column[] columns)
+        @Override public String generate()
+    }
+    
+    public class SelectSql extends Sql {
+        public SelectSql(String table, Column[] columns)
+        @Override public String generate()
+    }
+    
+    public class InsertSql extends Sql {
+        public InsertSql(String table, Column[] columns, Object[] fields)
+        @Override public String generate()
+        private String valuesList(Object[] fields, final Column[] columns)
+    }
+    
+    public class SelectWithCriteriaSql extends Sql {
+        public SelectWithCriteriaSql(
+        String table, Column[] columns, Criteria criteria)
+        @Override public String generate()
+    }
+    
+    public class SelectWithMatchSql extends Sql {
+        public SelectWithMatchSql(String table, Column[] columns, Column column, String pattern)
+        @Override public String generate()
+    }
+    
+    public class FindByKeySql extends Sql public FindByKeySql(
+        String table, Column[] columns, String keyColumn, String keyValue)
+        @Override public String generate()
+    }
+    
+    public class PreparedInsertSql extends Sql {
+        public PreparedInsertSql(String table, Column[] columns)
+        @Override public String generate() {
+        private String placeholderList(Column[] columns)
+    }
+    
+    public class Where {
+        public Where(String criteria) 
+        public String generate()
+    }
+    
+    public class ColumnList {
+        public ColumnList(Column[] columns) 
+        public String generate()
+    }
+    ```
+    
+    - 클래스가 서로 분리됨
+    - SRP, OCP(Open-Closed Principle) 지원
+        - OCP(Open-Closed Principle) : 클래스는 확장에 개방적이고 수정에 폐쇄적이어야 한다
+- 새 기능을 수정하거나 기존 기능을 변경할 때 건드릴 코드가 최소인 시스템 구조가 바람직하다
+
+### 변경으로부터 격리
+
+- 상세한 구현에 의존하는 클라이언트 클래스는 테스트가 어렵다
+- 시스템의 결합도를 낮추면 유연성과 재사용성도 더욱 높아진다
