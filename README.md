@@ -28,8 +28,8 @@
 | 7장         | 오류 처리       | ✅ | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/7%EC%9E%A5)         |
 | 8장         |  경계           | ✅ | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/8%EC%9E%A5)         |
 | 9장         |  단위 테스트    | ✅` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/9%EC%9E%A5)         |
-| 10장        |  클래스         | `진행중` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/10%EC%9E%A5)        |
-| 11장        |  시스템         | `진행중` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/11%EC%9E%A5)        |
+| 10장        |  클래스         | ✅ | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/10%EC%9E%A5)        |
+| 11장        |  시스템         | ✅ | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/11%EC%9E%A5)        |
 | 12장        |  창발성          | `진행중` |[바로가기](https://github.com/star-books-coffee/clean-code/tree/main/12%EC%9E%A5)       |
 | 13장        |  동시성          | ✅     |[바로가기](https://github.com/star-books-coffee/clean-code/tree/main/13%EC%9E%A5)        |
 | 14장        |                | `미완료` |          |
