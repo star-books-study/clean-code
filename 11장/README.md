@@ -40,27 +40,164 @@
     - 좀스럽고 손쉬운 기법으로 모듈성을 깨지 말자.
         - 객체를 생성하거나 의존성을 연결할 때에도 마찬가지
     - 설정 논리는 일반 실행 논리와 분리해야 모듈성이 높아짐.
-        
-        무슨 소리일까……… 모르겠다…
-        
 
-### Main 분리
+### (1) Main 분리
+
 시스템 설정과 시스템 사용을 분리하는 한 가지 방법
 
-- 생성과 관련한 코드는 모두 main이나 main이 호출하는 모듈로 옮기고, 나머지 시스템은 모든 객체가 생성되었고 모든 의존성이 연결되었다고 가정한다.
+- **생성과 관련한 코드는 모두 main이나 main이 호출하는 모듈로 옮기고, 나머지 시스템은 모든 객체가 생성되었고 모든 의존성이 연결되었다고 가정**한다.
     
-    !https://blog.kakaocdn.net/dn/bv2W3i/btq09xJQOy1/p3SGEZa8khncLpGY50cTrK/img.png
+    ![](https://blog.kakaocdn.net/dn/bv2W3i/btq09xJQOy1/p3SGEZa8khncLpGY50cTrK/img.png)
     
 - 제어 흐름은 따라가기 쉽다. main 함수에서 시스템에 필요한 객체를 생성한 후 이를 애플리케이션에 넘긴다.
 - 그림을 보면 모든 화살표가 main 쪽에서 애플리케이션 쪽을 향한다.
 - 즉, 애플리케이션은 main이나 객체가 생성되는 과정을 전혀 모른다. 단지 모든 객체가 적절히 생성되었다고 가정한다.
 
-## 팩토리
+### (2) 팩토리
+
 객체가 생성되는 시점을 애플리케이션이 결정해야 하는 경우엔 팩토리 형식을 사용할 수 있다.
+
+- 주문처리 시스템에서 애플리케이션은 LineItem 인스턴스를 생성해 Order에 추가한다.
+- 이때 ABSTRACT FACTORY 패턴을 이용한다.
+- 그러면 LineItem을 생성하는 시점은 애플리케이션이 결정하지만 LineItem을 생성하는 코드는 애플리케이션이 모른다.
 
 ![](https://user-images.githubusercontent.com/37948906/125300462-03ce8400-e365-11eb-8354-3f8bbbf3563a.png)
 
-- 장점
-    - Application은 FactoryImpl을 받아 필요할 때 Configured Object를 생성한다.
-    - Application은 Configured Object가 언제 생성되는지 알 수가 없다.
-    - 생성과 사용이 분리되었다.
+- 모든 의존성이 main에서 OrderProcessing 애플리케이션으로 향한다.
+- OrderProcessing 애플리케이션은 LineItem이 생성되는 구체적인 방법을 모른다.
+- 그 방법은 main 쪽에 있는 LineItemFactoryImplementation이 안다.
+
+### (3) 의존성 주입
+
+- 사용과 제작을 분리하는 강력한 메커니즘 하나가 의존성 주입이다.
+- 의존성 주입은 제어 역전(IoC) 기법을 의존성 관리에 적용한 메커니즘이다.
+- 제어 역전에서는 한 객체가 맡은 보조 책임을 새로운 객체에게 전적으로 떠넘긴다.
+- 새로운 객체는 넘겨받은 책임만 밭으므로 **단일 책임 원칙**을 지키게 된다.
+- 초기 설정은 시스템 전체에 필요하므로 대개 ‘책임질’ 메커니즘으로 ‘main’ 루틴이나 특수 컨테이너를 사용한다.
+
+다음은 의존성 주입을 ‘부분적으로’ 구현한 기능인 JNDI 검색 코드이다. 
+
+```java
+MyService myService = (MyService)(jndiContext.lookup("NameOfMyService"));
+```
+
+- 호출하는 객체는 실제로 반환되는 객체의 유형을 제어하지 않는다. 대신 호출하는 객체는 의존성을 능동적을 해결한다.
+
+진정한 의존성 주입은 클래스가 의존성을 해결하려 시도하지 않는다. 클래스는 완전히 수동적이다.
+
+- 자바 DI 컨테이너가 그 예다. 객체 사이의 의존성은 XML 파일에 정의하고 자바 코드에서는 이름으로 특정한 객체를 요청한다.
+- 초기화 지연으로 얻는 장점도 때론 여전히 유용하다.
+
+## 📌 확장
+
+- 처음부터 올바르게 시스템을 만들 수는 없다. 대신에 우리는 오늘 주어진 사용자의 스토리에 맞춰 시스템을 구현하고, 내일은 새로운 스토리에 맞춰 시스템을 조정하고 **확장**하면 된다. (애자일 방식의 핵심)
+- TDD와 리팩터링으로 얻어지는 깨끗한 코드는 코드 수준에서 시스템을 조정하고 확장하기 쉽게 만든다.
+- 하지만 시스템 아키텍처는 현실적으로 사전 계획이 필요하다. **관심사를 적절히 분리해 관리한다면 소프트웨어 아키텍쳐는 점진적으로 발전할 수 있다.**
+
+다음은 관심사를 적절히 분리하지 못해 유기적인 성장이 어려웠던 EJB1과 EJB2용 지역 인터페이스와 인터페이스를 구현한 코드이다.
+
+```java
+// 목록 11-1 Bank EJB용 EJB2 지역 인터페이스
+public interface BankLocal extends java.ejb.EJBLocalObject {
+	String getStreetAddr1() throws EJBException;
+	// 도시, 주 등 Bank 주소와 관련된 getter setter가 이어짐 ... 
+	Collection getAccounts() throws EJBException;
+	// 계좌 getter setter가 이어짐 ...
+}
+```
+
+```java
+public abstract class Bank implements javax.ejb.EntityBena {
+	// 비즈니스 논리...
+	public abstract String getStreetAddr1();
+	// 도시, 주 등 Bank 주소와 관련된 getter setter가 이어짐 ... 
+	// 계좌 getter setter가 이어짐 ...
+	public void addAccount(AccountDto accountDTO) {
+		InitialContext context = new InitialContext();
+		AccountHomeLocal accountHome = context.lookup("AccountHomeLocal");
+		AccountLocal account = accountHome.create(accountDTO);
+		Collection accounts = getAccounts();
+		accounts.add(account);
+	}
+	// EJB 컨테이너 논리
+	public abstract void setId(Integer id);
+	public abstract Integer getId();
+	public Integer ejbCreate(Integer id) { ... }
+	public void ejbPostCreate(Integer id) { ... }
+	// 나머지는 대부분 구현이 비어있으므로 생략
+}
+```
+
+- 비즈니스 논리가 덩치 큰 컨테이너와 밀접하게 결합된 탓에 독자적인 단위 테스트가 어렵다.
+- 빈은 다른 빈을 상속받지 못한다.
+    - EJB2 빈은 DTO를 정의하는데 이는 동일한 정보를 저장하는 자료 유형이 두 개라는 의미다.
+    - 다른 객체로 자료를 복사하는 반복적인 규격 코드가 필요하게 된다.
+
+### 횡단(cross-cutting) 관심사
+
+- EJB2 아키텍처는 일부영역에서 관심사를 거의 완벽하게 분리한다. (트랜잭션, 보안, 일부 영속적인 동작)
+- 영속성과 같은 **관심사**는 ****모든 객체가 전반적으로 동일한 방식을 이용하게 만들어야 한다.
+- 원론적으로는 모듈화되고 캡슐화된 방식으로 영속성 방식을 구상할 수 있지만 현실적으로는 영속성 방식을 구현한 코드가 온갖 객체로 흩어진다. 여기서 횡단 관심사라는 용어가 나온다.
+- 영속성 프레임워크와 도메인 논리 둘다 모듈화가 가능하지만 문제는 이 두 영역이 세밀한 단위로 겹친다.
+- AOP는 횡당 관심사에 대처해 모듈성을 확보하는 일반적인 방법론이다.
+    - “특정 관심사를 지원하려면 시스템에서 특정 지점들이 동작하는 방식을 일관성 있게 바꿔야 한다.”
+
+자바에서 사용하는 관점 혹은 관점과 유사한 메커니즘 세 개를 살펴보자.
+
+## 📌 자바 프록시
+
+- 단순한 상황에 적합하다. 개별 객체나 클래스에서 메서드 호출을 감싸는 경우가 좋은 예다.
+- 그러나 프록시를 사용하면 깨끗한 코드를 작성하기 어렵다. 시스템 단위로 실행 ‘지점’을 명시하는 메커니즘도 제공하지 않는다.
+
+## 📌 순수 자바 AOP 프레임 워크
+
+- 대부분의 프록시 코드는 판박이라 도구로 자동화할 수 있다. 스프링 AOP, JBoss AOP 등과 같은 자바 프레임워크는 내부적으로 프록시를 사용한다.
+- 스프링은 비즈니스 논리를 POJO로 구현한다. POJO는 순수하게 도메인에 초점을 맞춘다.
+- 스프링 V2.5 설정 파일 app.xml의 Bank 도메인 객체는 자료 접근자 객체(DAO)로 프록시 되었으며, 자료 접근자 객체는 JDBC 드라이버 자료 소스로 프록시되었다.
+    
+    ![](https://oopy.lazyrockets.com/api/v2/notion/image?src=https://s3-us-west-2.amazonaws.com/secure.notion-static.com/1a20a753-64d4-4733-b70f-4ee96a61dd69/Untitled.png&blockId=643532dc-0031-4fac-8cac-cf772eedf869)
+    
+- 애플리케이션에서 DI 컨테이너에게 (XML 파일에 명시된) 시스템 내 최상위 객체를 요청하려면 다음 코드가 필요하다.
+    
+    ```java
+    XmlBeanFactory = bf = new XmlBeanFactory(new ClassPathResource("app.xml", getClass());
+    Bank bank = (Bank) bf.getBean("bank");
+    ```
+    
+    스프링 관련 자바 코드가 거의 필요 없으므로 애플리케이션은 **사실상 스프링과 독립적이다.**
+    
+- EJB3는 XML 설정 파일과 자바5 애너테이션 기능을 사용해 횡단 관심사를 선언적으로 지원하는 스프링 모델을 따른다.
+- 애너테이션에 들어있는 영속성 정보는 일부든 전부든, 필요하다면 XML 배치 기술자로 옮겨도 괜찮다.
+
+## 📌 AspectJ 관점
+
+- 관심사를 관점으로 분리하는 가장 강력한 도구는 AspectJ 언어다.
+- AspectJ는 언어 차원에서 관점을 모듈화 구성으로 지원하는 자바 언어 확장이다.
+- 최근에 나온 AspectJ ‘애너테이션 폼’은 새로운 도구와 새로운 언어라는 부담을 어느 정도 완화한다.
+
+## 📌 테스트 주도 시스템 아키텍처 구축
+
+- 애플리케이션 도메인 논리를 POJO로 작성할 수 있다면(코드 수준에서 아키텍처 관심사를 분리할 수 있다면), 진정한 테스트 주도 아키텍처 구축이 가능해진다.
+- ‘아주 단순하면서도’ 멋지게 분리된 아키텍처로 소프트웨어 프로젝트를 진행해 결과물을 재빨리 출시한 후, 기반 구조를 추가하며 조금씩 확장해 나가도 괜찮다는 말이다.
+
+## 📌 의사 결정을 최적화하라.
+
+- 모듈을 나누고 관심사를 분리하면 지엽적인 관리와 결정이 가능해진다.
+- 큰 시스템에서는 한 사람이 모든 결정을 내리기 어렵다.
+- 가장 적합한 사람에게 책임을 맡기면 가장 좋다.
+
+## 📌 명백한 가치가 있을 때 표준을 현명하게 사용하라
+
+- 아주 과장되게 포장된 표준에 집착하느라 고객 가치를 뒷전으로 미루면 안된다.
+
+## 📌 시스템은 도메인 특화 언어(DSL)이 필요하다
+
+- DSL은 간단한 스크립트 언어나 표준 언어로 구현한 API를 말한다.
+- 좋은 DSL은 도메인 개념과 그 개념을 구현한 코드 사이에 존재하는 ‘의사소통 간극’을 줄여준다.
+- DSL을 효과적으로 사용한다면 모든 추상화 수준과 모든 도메인을 POJO로 표현할 수 있다.
+
+## 📌 결론
+
+- 모든 추상화 단계에서 의도는 명확히 표현해야 한다.
+- 그러려면 POJO를 작성하고 각 구현 관심사를 분리해야 한다.
+- 시스템을 설계하든 개별 모듈을 설계하든, 실제로 **돌아가는 가장 단순한 수단**을 사용해야 한다.
