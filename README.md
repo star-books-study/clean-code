@@ -30,11 +30,11 @@
 | 9장         |  단위 테스트    | ✅` | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/9%EC%9E%A5)         |
 | 10장        |  클래스         | ✅ | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/10%EC%9E%A5)        |
 | 11장        |  시스템         | ✅ | [바로가기](https://github.com/star-books-coffee/clean-code/tree/main/11%EC%9E%A5)        |
-| 12장        |  창발성          | `진행중` |[바로가기](https://github.com/star-books-coffee/clean-code/tree/main/12%EC%9E%A5)       |
+| 12장        |  창발성          | ✅ |[바로가기](https://github.com/star-books-coffee/clean-code/tree/main/12%EC%9E%A5)       |
 | 13장        |  동시성          | ✅     |[바로가기](https://github.com/star-books-coffee/clean-code/tree/main/13%EC%9E%A5)        |
-| 14장        |                | `미완료` |          |
-| 15장        |                | `미완료` |          |
-| 16장        |                | `미완료` |          |
-| 17장        |                | `미완료` |          |
-| 부록 A       | 동시성2         | `진행중` |          |
+| 14장        |  점진적인 개선     | ✅     |[바로가기](https://github.com/star-books-coffee/clean-code/tree/main/14%EC%9E%A5)        |
+| 15장        |  JUnit 들여다보기    | ✅     |[바로가기](https://github.com/star-books-coffee/clean-code/tree/main/15%EC%9E%A5)        |
+| 16장        |  SerialDate 리팩터링   | ✅     |[바로가기](https://github.com/star-books-coffee/clean-code/tree/main/16%EC%9E%A5)        |
+| 17장        | 냄새와 휴리스틱    | ✅     |[바로가기](https://github.com/star-books-coffee/clean-code/tree/main/17%EC%9E%A5)        |
+| 부록 A       | 동시성2        | ✅     |[바로가기](https://github.com/star-books-coffee/clean-code/tree/main/%EB%B6%80%EB%A1%9D%20A) |
 
