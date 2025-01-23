@@ -1,5 +1,6 @@
 # 클린코드
-<img src="https://image.yes24.com/goods/11681152/XL" width="300">
+<img src="https://github.com/user-attachments/assets/f823c1ab-eb8f-4b67-867b-aad9bb4783ef" width="300">
+
 
 ## 📚 스터디 규칙
 
